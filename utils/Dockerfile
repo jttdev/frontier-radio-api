@@ -1,7 +1,13 @@
-FROM kimbtechnologies/php_nginx:latest 
+FROM kimbtechnologies/php_nginx:latest
+
+ARG ALPINE_MIRROR=https://dl-cdn.alpinelinux.org/alpine
 
 # php redis support
-RUN apk add --update --no-cache $PHPIZE_DEPS \
+RUN sed -i \
+		-e "s|https://dl-cdn.alpinelinux.org/alpine|${ALPINE_MIRROR}|g" \
+		-e "s|http://dl-cdn.alpinelinux.org/alpine|${ALPINE_MIRROR}|g" \
+		/etc/apk/repositories \
+	&& apk add --update --no-cache $PHPIZE_DEPS \
 	&& pecl install redis \
 	&& docker-php-ext-enable redis
 

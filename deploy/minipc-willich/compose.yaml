@@ -1,0 +1,44 @@
+services:
+  radio-api:
+    build:
+      context: ../..
+      dockerfile: utils/Dockerfile
+      args:
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-https://dl-cdn.alpinelinux.org/alpine}
+    image: jttdev/frontier-radio-api:local
+    restart: unless-stopped
+    ports:
+      # This host also has a WireGuard interface. Bind the emulated Frontier
+      # endpoints only to the Germany LAN address.
+      - "10.3.0.12:80:80"
+      - "10.3.0.12:443:443"
+    volumes:
+      - ./data:/php-code/data
+      - ./media:/php-code/media
+    environment:
+      CONF_DOMAIN: http://10.3.0.12/
+      CONF_ALLOWED_DOMAIN: all
+      CONF_CACHE_EXPIRE: "1200"
+      CONF_USE_JSON_CACHE: "false"
+      CONF_REDIS_HOST: redis
+      CONF_STREAM_JSON: "false"
+      CONF_USE_LOGO_CACHE: "true"
+      CONF_FAVORITE_ITEMS: Radio,Radio-Browser
+    depends_on:
+      redis:
+        condition: service_healthy
+
+  redis:
+    image: redis:8-alpine
+    restart: unless-stopped
+    command: redis-server --save 60 1 --loglevel warning
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  redis-data:

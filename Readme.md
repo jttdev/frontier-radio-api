@@ -1,5 +1,8 @@
 # Radio-API
 
+> This is the jttdev fork used for the Willich Auna radios. Its production
+> Compose deployment lives in [`deploy/minipc-willich/`](deploy/minipc-willich/).
+
 > Silicon Frontier, Frontier Silicon, or Frontier Nuvola (Smart) Internet Radio alternative API
 
 see https://github.com/kimbtech/WiFi-RadioAPI for information about the (XML) API used by the radios  
