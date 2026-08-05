@@ -6,6 +6,8 @@ favorites backend for the Auna internet radios on the Germany LAN.
 The Germany UDM resolves these exact directory endpoints to `10.3.0.12`:
 
 - `auna.wifiradiofrontier.com` — older vendor-specific XML API
+- `auna2.wifiradiofrontier.com` — older vendor-specific XML API fallback
+- `pri.logon.wifiradiofrontier.com` — legacy FS2026 XML API used by NE-6146T11
 - `airable.wifiradiofrontier.com` — newer shared JSON API
 
 The UDM does not override `time.wifiradiofrontier.com` or
@@ -34,6 +36,8 @@ stations and podcasts.
 
 ```bash
 dig @10.3.0.1 auna.wifiradiofrontier.com A +short
+dig @10.3.0.1 auna2.wifiradiofrontier.com A +short
+dig @10.3.0.1 pri.logon.wifiradiofrontier.com A +short
 dig @10.3.0.1 airable.wifiradiofrontier.com A +short
 curl -fsS http://10.3.0.12/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0
 curl -kfsS -H 'Host: airable.wifiradiofrontier.com' https://10.3.0.12/
