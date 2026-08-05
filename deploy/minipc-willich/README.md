@@ -1,12 +1,14 @@
 # Willich mini-PC deployment
 
 This stack runs the self-hosted Frontier Silicon/Nuvola directory and
-favorites backend for the Auna internet radios on the Germany LAN.
+favorites backend for the Auna and Hama internet radios on the Germany LAN.
 
 The Germany UDM resolves these exact directory endpoints to `10.3.0.12`:
 
 - `auna.wifiradiofrontier.com` — older vendor-specific XML API
 - `auna2.wifiradiofrontier.com` — older vendor-specific XML API fallback
+- `hama.wifiradiofrontier.com` — Hama vendor-specific XML API
+- `hama2.wifiradiofrontier.com` — Hama vendor-specific XML API fallback
 - `pri.logon.wifiradiofrontier.com` — legacy FS2026 XML API used by NE-6146T11
 - `airable.wifiradiofrontier.com` — newer shared JSON API
 
@@ -37,6 +39,8 @@ stations and podcasts.
 ```bash
 dig @10.3.0.1 auna.wifiradiofrontier.com A +short
 dig @10.3.0.1 auna2.wifiradiofrontier.com A +short
+dig @10.3.0.1 hama.wifiradiofrontier.com A +short
+dig @10.3.0.1 hama2.wifiradiofrontier.com A +short
 dig @10.3.0.1 pri.logon.wifiradiofrontier.com A +short
 dig @10.3.0.1 airable.wifiradiofrontier.com A +short
 curl -fsS http://10.3.0.12/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0
