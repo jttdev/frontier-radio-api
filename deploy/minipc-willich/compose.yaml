@@ -18,27 +18,9 @@ services:
     environment:
       CONF_DOMAIN: http://10.3.0.12/
       CONF_ALLOWED_DOMAIN: all
+      CONF_SHUFFLE_MUSIC: "true"
       CONF_CACHE_EXPIRE: "1200"
-      CONF_USE_JSON_CACHE: "false"
-      CONF_REDIS_HOST: redis
+      CONF_USE_JSON_CACHE: "true"
       CONF_STREAM_JSON: "false"
       CONF_USE_LOGO_CACHE: "true"
       CONF_FAVORITE_ITEMS: Radio,Radio-Browser
-    depends_on:
-      redis:
-        condition: service_healthy
-
-  redis:
-    image: redis:8-alpine
-    restart: unless-stopped
-    command: redis-server --save 60 1 --loglevel warning
-    volumes:
-      - redis-data:/data
-    healthcheck:
-      test: ["CMD", "redis-cli", "ping"]
-      interval: 10s
-      timeout: 3s
-      retries: 5
-
-volumes:
-  redis-data:

@@ -23,8 +23,8 @@ ssh -o BatchMode=yes willich '
 ```
 
 The ignored `data/` and `media/` directories contain station lists, podcast
-state, the generated TLS certificate, and cached logos. Redis state lives in
-the Compose volume.
+state, the generated TLS certificate, and cached logos. The deployment uses
+Radio-API's file-backed JSON cache because this is a small private instance.
 
 The management UI is `http://10.3.0.12/gui/`. Open Internet Radio on a radio,
 find its `GUI-Code` menu entry, and use that code to manage that radio's custom
