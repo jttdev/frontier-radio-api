@@ -12,20 +12,29 @@ scaled-down press logo.
 | --- | --- | --- |
 | `asiafm-cantonese.png` | AsiaFM Cantonese | `/assets/150x150/13/23/935350.png` |
 | `die-maus.png` | Die Maus | `/assets/150x150/81/32/635517.png` |
-| `generations-funk.png` | Generations Funk | `/assets/150x150/00/41/225798.png` |
+| `hr1.png` | hr1 | `/assets/150x150/37/52/196638.png` |
 | `kcea-big-band.png` | KCEA 89.1 Big Band | `/assets/150x150/45/86/956155.png` |
 | `radio-swiss-jazz.png` | Radio Swiss Jazz | `/assets/150x150/81/30/775522.png` |
+| `radio-swiss-pop.png` | Radio Swiss Pop | `/assets/150x150/29/07/458975.png` |
 | `solar-radio.png` | Solar Radio | `/assets/150x150/16/63/420280.png` |
 | `somafm-seven-inch-soul.png` | SomaFM Seven Inch Soul | `/assets/150x150/74/18/302962.png` |
 | `starpoint-radio.png` | Starpoint Radio | `/assets/150x150/29/59/100404.png` |
 | `superfly-fm.png` | Superfly FM | `/assets/150x150/90/44/630117.png` |
 | `wdr2-rheinland.png` | WDR 2 Rheinland | `/assets/150x150/35/03/767379.png` |
+| `wefunk-radio.png` | WEFUNK Radio | `/assets/150x150/62/13/261769.png` |
 
-`wdr-cosmo.png` is the exception: the main COSMO channel is absent from the
-upstream catalogue (only its sub-channels are listed), so it comes from WDR's
-own press asset at
-`www1.wdr.de/radio/cosmo/ueber-uns/cosmo-logo-100~_v-square-m.jpg`, resized to
-150x150 on a white background to match the rest.
+Three stations are absent from the upstream catalogue and use the
+broadcaster's own artwork instead, normalised to 150x150 to match the rest:
+
+| File | Station | Source |
+| --- | --- | --- |
+| `generation-soul-disco-funk.png` | Generation Soul Disco Funk | `radiogoodlife.com/wp-content/uploads/2022/08/Logo_G_Radio_500px-370x370.png` |
+| `the-face-radio.png` | The Face Radio | `liveradio.ie/files/images/571335/resized/180x172c/the_face_radio.jpg` |
+| `wdr-cosmo.png` | WDR COSMO | `www1.wdr.de/radio/cosmo/ueber-uns/cosmo-logo-100~_v-square-m.jpg` |
+
+Centre-crop non-square sources to a square before resizing. Padding them to
+150x150 instead leaves visible bars on the radio display, which is obvious on
+artwork with a dark background.
 
 They must be vendored rather than linked: `assets.wifiradiofrontier.com` is a
 CNAME to `airable.wifiradiofrontier.com`, which the Germany UDM overrides to
