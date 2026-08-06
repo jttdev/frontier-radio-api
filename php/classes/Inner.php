@@ -57,6 +57,7 @@ class Inner {
 							'logo' => self::filterURL( $_POST['logo'][$id] ),
 							'desc' => self::filterName( $_POST['desc'][$id] ),
 							'proxy' => isset($_POST['proxy'][$id]) && $_POST['proxy'][$id] == 'yes',
+							'nometa' => isset($_POST['nometa'][$id]) && $_POST['nometa'][$id] == 'yes',
 							'type' => !empty($_POST['type'][$id]) && $_POST['type'][$id] == 'nc' ? 'nc' : 'radio',
 							'category' => $this->getCategory($id)
 						);
@@ -148,6 +149,8 @@ class Inner {
 				"URL" => $radio['url'],
 				"PROXY_YES" => $radio['proxy'] ? 'checked="checked"' : '',
 				"PROXY_NO" => !$radio['proxy'] ? 'checked="checked"' : '',
+				"NOMETA_YES" => !empty($radio['nometa']) ? 'checked="checked"' : '',
+				"NOMETA_NO" => empty($radio['nometa']) ? 'checked="checked"' : '',
 				"TYPE_RADIO" => $radio['type'] != 'nc' ? 'checked="checked"' : '',
 				"TYPE_NC" => $radio['type'] == 'nc' ? 'checked="checked"' : '',
 				"LOGO" => $radio['logo'],

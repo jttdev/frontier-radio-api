@@ -21,6 +21,8 @@
 			"%%URL%%" : "",
 			"%%PROXY_YES%%" : "",
 			"%%PROXY_NO%%" : "",
+			"%%NOMETA_YES%%" : "",
+			"%%NOMETA_NO%%" : "",
 			"%%TYPE_RADIO%%" : "",
 			"%%TYPE_NC%%" : "",
 			"%%LOGO%%" : "",

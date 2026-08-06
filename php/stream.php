@@ -35,10 +35,13 @@ if( !empty( $_GET['id'] ) ){
 
 	// id ok?
 	if( is_numeric( $id ) && preg_replace('/[^0-9]/','', $id ) === $id ){
+		// stations may opt out of ICY metadata, see /proxy-nometa/ in nginx.conf
+		$nometa = false;
 		if( !isset($_GET['eid']) && !isset( $_GET['track'] ) ){ // station
 			// get url
-			$station = $data->getById( (int)$id ); 
+			$station = $data->getById( (int)$id );
 			$url = !empty($station) ? $station['url'] : '';
+			$nometa = !empty($station['nometa']);
 		}
 		else if(isset( $_GET['eid'] ) && is_numeric( $_GET['eid'] ) && preg_replace('/[^0-9]/','', $_GET['eid'] ) === $_GET['eid'] ){ // podcast episode
 			$ed = PodcastLoader::getEpisodeData( (int)$id, (int)$_GET['eid'], $data );
@@ -79,7 +82,8 @@ if( !empty( $_GET['id'] ) ){
 				// allow only external ips
 				if( filter_var( $ip, FILTER_VALIDATE_IP, FILTER_FLAG_NO_PRIV_RANGE |  FILTER_FLAG_NO_RES_RANGE) !== false ){
 					//let nginx do the rest
-					header("X-Accel-Redirect: /proxy/". $host ."/?" . $url );
+					$proxy = $nometa ? '/proxy-nometa/' : '/proxy/';
+					header("X-Accel-Redirect: ". $proxy . $host ."/?" . $url );
 					die();
 				}
 			}
