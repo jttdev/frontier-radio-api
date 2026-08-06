@@ -82,16 +82,22 @@ files manually.
 The live GUI/runtime data is the source of truth; verify it before making a
 scripted update. The current baseline is:
 
-| ID | Name | Proxy | Stream URL |
-| --- | --- | --- | --- |
-| 1000 | CLASSIC HITS RADIO 70 80 DiscoFunk ModernSoul Boogie | yes | `https://radiopanther.radiolebowski.com/play` |
-| 1001 | Jazz Radio Funk | no | `http://jazz-wr06.ice.infomaniak.ch/jazz-wr06-128.mp3` |
-| 1002 | FUNKY RADIO - Only Funk Music 60s 70s | yes | `https://funkyradio.streamingmedia.it/play.mp3` |
-| 1003 | AsiaFM Cantonese | no | `http://yyt.asiafm.net:8000/asiafm` |
-| 1004 | Radio Swiss Jazz | yes | `https://livestreaming-node-1.srg-ssr.ch/srgssr/rsj/mp3/128` |
-| 1005 | KCEA 89.1 Big Band | no | `http://streaming.rubinbroadcasting.com/kcea` |
-| 1006 | Die Maus | no | `http://wdr-diemaus-live.icecast.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3` |
-| 1007 | WDR 2 Rheinland | no | `http://wdr-wdr2-rheinland.icecast.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3` |
+Every station is `proxy=no` and carries vendored artwork from
+`deploy/minipc-willich/station-logos/`.
+
+| ID | Name | Stream URL |
+| --- | --- | --- |
+| 1000 | AsiaFM Cantonese | `http://yyt.asiafm.net:8000/asiafm` |
+| 1001 | Radio Swiss Jazz | `http://stream.srg-ssr.ch/srgssr/rsj/aac/192` |
+| 1002 | KCEA 89.1 Big Band | `http://streaming.rubinbroadcasting.com/kcea` |
+| 1003 | Die Maus | `http://wdr-diemaus-live.icecast.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3` |
+| 1004 | WDR 2 Rheinland | `http://wdr-wdr2-rheinland.icecast.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3` |
+| 1005 | WDR COSMO | `http://wdr-cosmo-live.icecast.wdr.de/wdr/cosmo/live/mp3/128/stream.mp3` |
+| 1006 | Superfly FM | `http://web.stream.superfly.fm/superfly-live/stream/mp3` |
+| 1007 | SomaFM Seven Inch Soul | `http://ice3.somafm.com/7soul-128-mp3` |
+| 1008 | Solar Radio | `http://listen-msmn.sharp-stream.com/solarhigh.mp3` |
+| 1009 | Starpoint Radio | `http://stream2.hippynet.co.uk:8084/stream.mp3` |
+| 1010 | Generations Funk | `http://gene-wr05.ice.infomaniak.ch/gene-wr05.mp3` |
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
@@ -124,11 +130,13 @@ reordered.
   ```
 
 - Do a GET test; many Icecast/Shoutcast servers return 400 to HEAD requests.
-- The SRG stable Radio Swiss Jazz URL redirects to a rotating node. NGINX's
-  internal stream proxy does not chase that upstream redirect, so the current
-  favorite pins a tested direct SRG node. If it fails, resolve the current
-  official stream node or fix redirect handling in `utils/nginx.conf` and
-  `php/stream.php`; do not leave a 302 response as “working.”
+- NGINX's internal stream proxy does not chase upstream redirects, so a
+  redirecting URL must never be combined with `proxy=yes`. Prefer the reverse:
+  a plain-`http://` entry point with `proxy=no`, which lets the radio follow
+  the 302 itself. SRG is the worked example — `http://stream.srg-ssr.ch/srgssr/
+  rsj/aac/192` redirects to a rotating `livestreaming-node-N` over plain HTTP
+  and needs no proxy, which beats pinning a node that later disappears. Never
+  leave a 302 response counted as “working.”
 - ARD/WDR streams must stay `proxy=no` and keep their plain-`http://`
   `icecast.wdr.de` entry point. They answer with a single 302 to a
   per-request, token-signed `*.rndfnk.com` node; the radio follows that hop
