@@ -107,6 +107,10 @@ Every station carries vendored artwork from
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
 
+Station 1010 keeps its original name deliberately: the broadcaster rebranded to
+Good Life, so the stream reports `icy-name: GOODLIFE`. Do not rename it to match
+the metadata.
+
 ## Station-management invariants
 
 - Use the GUI where possible. A radio-list POST replaces the entire list;
