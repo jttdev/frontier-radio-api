@@ -19,7 +19,7 @@ The UDM does not override `time.wifiradiofrontier.com` or
 
 ```bash
 ssh -o BatchMode=yes willich '
-  cd ~/frontier-radio-api/deploy/minipc-willich &&
+  cd ~/frontier-radio-api/deploy/minipc-germany-01 &&
   mkdir -p data media &&
   git pull --ff-only &&
   docker compose up -d --build
@@ -46,7 +46,7 @@ dig @10.3.0.1 airable.wifiradiofrontier.com A +short
 curl -fsS http://10.3.0.12/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0
 curl -kfsS -H 'Host: airable.wifiradiofrontier.com' https://10.3.0.12/
 ssh -o BatchMode=yes willich '
-  cd ~/frontier-radio-api/deploy/minipc-willich &&
+  cd ~/frontier-radio-api/deploy/minipc-germany-01 &&
   docker compose ps && docker compose logs --tail=50
 '
 ```

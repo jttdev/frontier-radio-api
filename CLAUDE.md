@@ -11,23 +11,23 @@ radios on the Germany home LAN.
 - `upstream`: `https://github.com/KIMB-technologies/Radio-API.git`
 - Keep upstream-facing application changes separable where practical.
 - `php/`, `utils/`: upstream application and container source.
-- `deploy/minipc-willich/`: production Compose stack and deployment runbook.
+- `deploy/minipc-germany-01/`: production Compose stack and deployment runbook.
 - Germany DNS belongs to
   `/home/janosch/DEV/infra/infra-configs/unifi/sites/germany/main.tf`, not this
   repo. Load the `unifi-network` skill before changing it.
 
 ## Production topology
 
-- Host: SSH alias `minipc-willich`, LAN address `10.3.0.12`.
+- Host: SSH alias `minipc-germany-01`, LAN address `10.3.0.12`.
 - Server checkout: `/home/janosch/frontier-radio-api`.
-- Container: `minipc-willich-radio-api-1`.
+- Container: `minipc-germany-01-radio-api-1`.
 - HTTP and HTTPS bind only to `10.3.0.12`; no DNS service runs on the mini-PC.
 - Management UI: `http://10.3.0.12/gui/`.
 - Both physical radios are merged into one shared GUI profile and therefore
   receive the same favorites. Do not commit GUI codes or radio auth tokens.
 - Runtime state is file-backed JSON under ignored
-  `deploy/minipc-willich/data/`; cached logos and generated TLS material live
-  under ignored `deploy/minipc-willich/media/`. Never commit either directory.
+  `deploy/minipc-germany-01/data/`; cached logos and generated TLS material live
+  under ignored `deploy/minipc-germany-01/media/`. Never commit either directory.
 
 The Germany UDM resolves only these compiled-in directory hosts to
 `10.3.0.12`:
@@ -83,7 +83,7 @@ The live GUI/runtime data is the source of truth; verify it before making a
 scripted update. The current baseline is:
 
 Every station carries vendored artwork from
-`deploy/minipc-willich/station-logos/`. The two TLS-only streams need
+`deploy/minipc-germany-01/station-logos/`. The two TLS-only streams need
 `proxy=yes`; so does AsiaFM, which is proxied only to drop its ICY metadata
 (see the `nometa` invariant below). Everything else reaches its stream over
 plain HTTP.
@@ -131,7 +131,7 @@ reordered.
   endless stream:
 
   ```bash
-  ssh -o BatchMode=yes minipc-willich \
+  ssh -o BatchMode=yes minipc-germany-01 \
     "curl -sSL -A 'NSPlayer/8.0.0.3801' --max-time 5 -o /dev/null \
     -w '%{http_code} %{content_type} %{size_download}\n' '<stream-url>'"
   ```
@@ -157,7 +157,7 @@ reordered.
   `assets.wifiradiofrontier.com` is a CNAME to `airable.wifiradiofrontier.com`,
   which the UDM overrides to `10.3.0.12`, so the whole LAN — including the
   container that would cache the logo — resolves the asset CDN to this server
-  and gets a 303. Vendor the PNG under `deploy/minipc-willich/station-logos/`
+  and gets a 303. Vendor the PNG under `deploy/minipc-germany-01/station-logos/`
   and point `logo` at `http://10.3.0.12/station-logos/<file>.png`. The upstream
   directory is still live and serves the artwork and station metadata to a
   synthetic `mac`; lookup recipe and provenance in that directory's README.
@@ -180,8 +180,8 @@ reordered.
 2. Have the user open Internet Radio → Station List while watching logs:
 
    ```bash
-   ssh -o BatchMode=yes minipc-willich \
-     'docker logs -f --since 1m minipc-willich-radio-api-1 2>&1'
+   ssh -o BatchMode=yes minipc-germany-01 \
+     'docker logs -f --since 1m minipc-germany-01-radio-api-1 2>&1'
    ```
 
 3. If it still goes upstream, capture only that client's DNS and HTTP(S)
@@ -206,10 +206,10 @@ Deploy tracked changes only through git: commit and push locally, then pull
 and rebuild on the mini-PC. Never copy tracked source files directly.
 
 ```bash
-ssh -o BatchMode=yes minipc-willich '
+ssh -o BatchMode=yes minipc-germany-01 '
   cd /home/janosch/frontier-radio-api &&
   git pull --ff-only &&
-  docker compose -f deploy/minipc-willich/compose.yaml up -d --build
+  docker compose -f deploy/minipc-germany-01/compose.yaml up -d --build
 '
 ```
 
@@ -222,8 +222,8 @@ apply. Basic production checks:
 dig @10.3.0.1 hama.wifiradiofrontier.com A +short
 dig @10.3.0.1 pri.logon.wifiradiofrontier.com A +short
 curl -fsS http://10.3.0.12/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0
-ssh -o BatchMode=yes minipc-willich \
-  'docker ps --filter name=minipc-willich-radio-api-1'
+ssh -o BatchMode=yes minipc-germany-01 \
+  'docker ps --filter name=minipc-germany-01-radio-api-1'
 ```
 
-See `deploy/minipc-willich/README.md` for the canonical deployment runbook.
+See `deploy/minipc-germany-01/README.md` for the canonical deployment runbook.
