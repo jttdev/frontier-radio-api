@@ -90,6 +90,8 @@ scripted update. The current baseline is:
 | 1003 | AsiaFM Cantonese | no | `http://yyt.asiafm.net:8000/asiafm` |
 | 1004 | Radio Swiss Jazz | yes | `https://livestreaming-node-1.srg-ssr.ch/srgssr/rsj/mp3/128` |
 | 1005 | KCEA 89.1 Big Band | no | `http://streaming.rubinbroadcasting.com/kcea` |
+| 1006 | Die Maus | no | `http://wdr-diemaus-live.icecast.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3` |
+| 1007 | WDR 2 Rheinland | no | `http://wdr-wdr2-rheinland.icecast.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3` |
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
@@ -127,6 +129,12 @@ reordered.
   favorite pins a tested direct SRG node. If it fails, resolve the current
   official stream node or fix redirect handling in `utils/nginx.conf` and
   `php/stream.php`; do not leave a 302 response as “working.”
+- ARD/WDR streams must stay `proxy=no` and keep their plain-`http://`
+  `icecast.wdr.de` entry point. They answer with a single 302 to a
+  per-request, token-signed `*.rndfnk.com` node; the radio follows that hop
+  itself and the whole chain stays HTTP, so no TLS is needed. The SRG trick of
+  pinning the resolved node does not transfer here — the token expires. The
+  `icecastssl.wdr.de` variants work in curl but add a TLS hop for no benefit.
 - HTTPS proxying requires both `proxy_ssl_server_name on` and
   `proxy_ssl_name`; preserve the SNI handling in `utils/nginx.conf`.
 
