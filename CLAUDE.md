@@ -83,12 +83,14 @@ The live GUI/runtime data is the source of truth; verify it before making a
 scripted update. The current baseline is:
 
 Every station carries vendored artwork from
-`deploy/minipc-willich/station-logos/`. Only the two TLS-only streams need
-`proxy=yes`; everything else reaches its stream over plain HTTP.
+`deploy/minipc-willich/station-logos/`. The two TLS-only streams need
+`proxy=yes`; so does AsiaFM, which is proxied only to drop its ICY metadata
+(see the `nometa` invariant below). Everything else reaches its stream over
+plain HTTP.
 
 | ID | Name | Proxy | Stream URL |
 | --- | --- | --- | --- |
-| 1000 | AsiaFM Cantonese | no | `http://yyt.asiafm.net:8000/asiafm` |
+| 1000 | AsiaFM Cantonese | yes | `http://yyt.asiafm.net:8000/asiafm` |
 | 1001 | Radio Swiss Jazz | no | `http://stream.srg-ssr.ch/srgssr/rsj/aac/192` |
 | 1002 | KCEA 89.1 Big Band | no | `http://streaming.rubinbroadcasting.com/kcea` |
 | 1003 | Die Maus | no | `http://wdr-diemaus-live.icecast.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3` |
@@ -159,6 +161,16 @@ reordered.
   and point `logo` at `http://10.3.0.12/station-logos/<file>.png`. The upstream
   directory is still live and serves the artwork and station metadata to a
   synthetic `mac`; lookup recipe and provenance in that directory's README.
+- A station may set `nometa` to suppress its ICY metadata, for streams whose
+  now-playing text the firmware cannot render — CJK titles on a font that lacks
+  the glyphs, or metadata that is malformed at source. `stream.php` then routes
+  it to the `/proxy-nometa/` location, which clears the `Icy-MetaData` request
+  header so the upstream never interleaves metadata, and hides `icy-metaint`.
+  The display falls back to the station name from the directory. It only takes
+  effect together with `proxy=yes`, since the stripping happens in the proxy,
+  and it is per station: other proxied stations keep their now-playing text.
+  AsiaFM is the live example — it sends truncated multi-byte UTF-8 in
+  `StreamTitle` that no client can decode.
 - HTTPS proxying requires both `proxy_ssl_server_name on` and
   `proxy_ssl_name`; preserve the SNI handling in `utils/nginx.conf`.
 
