@@ -135,6 +135,17 @@ reordered.
   itself and the whole chain stays HTTP, so no TLS is needed. The SRG trick of
   pinning the resolved node does not transfer here — the token expires. The
   `icecastssl.wdr.de` variants work in curl but add a TLS hop for no benefit.
+- A `logo` value that does not start with `http` renders the generic
+  `media/default.png`, so every station without artwork looks identical.
+  Prefer the original Frontier 150x150 assets — they are drawn for these
+  displays. They cannot be linked directly:
+  `assets.wifiradiofrontier.com` is a CNAME to `airable.wifiradiofrontier.com`,
+  which the UDM overrides to `10.3.0.12`, so the whole LAN — including the
+  container that would cache the logo — resolves the asset CDN to this server
+  and gets a 303. Vendor the PNG under `deploy/minipc-willich/station-logos/`
+  and point `logo` at `http://10.3.0.12/station-logos/<file>.png`. The upstream
+  directory is still live and serves the artwork and station metadata to a
+  synthetic `mac`; lookup recipe and provenance in that directory's README.
 - HTTPS proxying requires both `proxy_ssl_server_name on` and
   `proxy_ssl_name`; preserve the SNI handling in `utils/nginx.conf`.
 
