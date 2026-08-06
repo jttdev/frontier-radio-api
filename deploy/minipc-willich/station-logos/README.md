@@ -10,8 +10,22 @@ scaled-down press logo.
 
 | File | Station | Original CDN path |
 | --- | --- | --- |
+| `asiafm-cantonese.png` | AsiaFM Cantonese | `/assets/150x150/13/23/935350.png` |
 | `die-maus.png` | Die Maus | `/assets/150x150/81/32/635517.png` |
+| `generations-funk.png` | Generations Funk | `/assets/150x150/00/41/225798.png` |
+| `kcea-big-band.png` | KCEA 89.1 Big Band | `/assets/150x150/45/86/956155.png` |
+| `radio-swiss-jazz.png` | Radio Swiss Jazz | `/assets/150x150/81/30/775522.png` |
+| `solar-radio.png` | Solar Radio | `/assets/150x150/16/63/420280.png` |
+| `somafm-seven-inch-soul.png` | SomaFM Seven Inch Soul | `/assets/150x150/74/18/302962.png` |
+| `starpoint-radio.png` | Starpoint Radio | `/assets/150x150/29/59/100404.png` |
+| `superfly-fm.png` | Superfly FM | `/assets/150x150/90/44/630117.png` |
 | `wdr2-rheinland.png` | WDR 2 Rheinland | `/assets/150x150/35/03/767379.png` |
+
+`wdr-cosmo.png` is the exception: the main COSMO channel is absent from the
+upstream catalogue (only its sub-channels are listed), so it comes from WDR's
+own press asset at
+`www1.wdr.de/radio/cosmo/ueber-uns/cosmo-logo-100~_v-square-m.jpg`, resized to
+150x150 on a white background to match the rest.
 
 They must be vendored rather than linked: `assets.wifiradiofrontier.com` is a
 CNAME to `airable.wifiradiofrontier.com`, which the Germany UDM overrides to
