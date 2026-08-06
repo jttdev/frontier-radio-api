@@ -98,7 +98,7 @@ Every station carries vendored artwork from
 | 1007 | SomaFM Seven Inch Soul | no | `http://ice3.somafm.com/7soul-128-mp3` |
 | 1008 | Solar Radio | no | `http://listen-msmn.sharp-stream.com/solarhigh.mp3` |
 | 1009 | Starpoint Radio | no | `http://stream2.hippynet.co.uk:8084/stream.mp3` |
-| 1010 | Generation Soul Disco Funk | yes | `https://gestream.fr/g-radio-hd.mp3` |
+| 1010 | GOODLIFE | yes | `https://gestream.fr/g-radio-hd.mp3` |
 | 1011 | The Face Radio | yes | `https://the-face-radio.radiocult.fm/stream` |
 | 1012 | Radio Swiss Pop | no | `http://stream.srg-ssr.ch/srgssr/rsp/aac/192` |
 | 1013 | WEFUNK Radio | no | `http://s-09.wefunkradio.com:8000/wefunk64.mp3` |
@@ -106,10 +106,6 @@ Every station carries vendored artwork from
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
-
-Station 1010 keeps its original name deliberately: the broadcaster rebranded to
-Good Life, so the stream reports `icy-name: GOODLIFE`. Do not rename it to match
-the metadata.
 
 ## Station-management invariants
 

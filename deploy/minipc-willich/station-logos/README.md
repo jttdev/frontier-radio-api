@@ -28,7 +28,7 @@ broadcaster's own artwork instead, normalised to 150x150 to match the rest:
 
 | File | Station | Source |
 | --- | --- | --- |
-| `generation-soul-disco-funk.png` | Generation Soul Disco Funk | `radiogoodlife.com/wp-content/uploads/2022/08/Logo_G_Radio_500px-370x370.png` |
+| `goodlife.png` | GOODLIFE | `radiogoodlife.com/wp-content/uploads/2022/08/Logo_G_Radio_500px-370x370.png` |
 | `the-face-radio.png` | The Face Radio | `liveradio.ie/files/images/571335/resized/180x172c/the_face_radio.jpg` |
 | `wdr-cosmo.png` | WDR COSMO | `www1.wdr.de/radio/cosmo/ueber-uns/cosmo-logo-100~_v-square-m.jpg` |
 
