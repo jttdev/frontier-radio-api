@@ -82,22 +82,27 @@ files manually.
 The live GUI/runtime data is the source of truth; verify it before making a
 scripted update. The current baseline is:
 
-Every station is `proxy=no` and carries vendored artwork from
-`deploy/minipc-willich/station-logos/`.
+Every station carries vendored artwork from
+`deploy/minipc-willich/station-logos/`. Only the two TLS-only streams need
+`proxy=yes`; everything else reaches its stream over plain HTTP.
 
-| ID | Name | Stream URL |
-| --- | --- | --- |
-| 1000 | AsiaFM Cantonese | `http://yyt.asiafm.net:8000/asiafm` |
-| 1001 | Radio Swiss Jazz | `http://stream.srg-ssr.ch/srgssr/rsj/aac/192` |
-| 1002 | KCEA 89.1 Big Band | `http://streaming.rubinbroadcasting.com/kcea` |
-| 1003 | Die Maus | `http://wdr-diemaus-live.icecast.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3` |
-| 1004 | WDR 2 Rheinland | `http://wdr-wdr2-rheinland.icecast.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3` |
-| 1005 | WDR COSMO | `http://wdr-cosmo-live.icecast.wdr.de/wdr/cosmo/live/mp3/128/stream.mp3` |
-| 1006 | Superfly FM | `http://web.stream.superfly.fm/superfly-live/stream/mp3` |
-| 1007 | SomaFM Seven Inch Soul | `http://ice3.somafm.com/7soul-128-mp3` |
-| 1008 | Solar Radio | `http://listen-msmn.sharp-stream.com/solarhigh.mp3` |
-| 1009 | Starpoint Radio | `http://stream2.hippynet.co.uk:8084/stream.mp3` |
-| 1010 | Generations Funk | `http://gene-wr05.ice.infomaniak.ch/gene-wr05.mp3` |
+| ID | Name | Proxy | Stream URL |
+| --- | --- | --- | --- |
+| 1000 | AsiaFM Cantonese | no | `http://yyt.asiafm.net:8000/asiafm` |
+| 1001 | Radio Swiss Jazz | no | `http://stream.srg-ssr.ch/srgssr/rsj/aac/192` |
+| 1002 | KCEA 89.1 Big Band | no | `http://streaming.rubinbroadcasting.com/kcea` |
+| 1003 | Die Maus | no | `http://wdr-diemaus-live.icecast.wdr.de/wdr/diemaus/live/mp3/128/stream.mp3` |
+| 1004 | WDR 2 Rheinland | no | `http://wdr-wdr2-rheinland.icecast.wdr.de/wdr/wdr2/rheinland/mp3/128/stream.mp3` |
+| 1005 | WDR COSMO | no | `http://wdr-cosmo-live.icecast.wdr.de/wdr/cosmo/live/mp3/128/stream.mp3` |
+| 1006 | Superfly FM | no | `http://web.stream.superfly.fm/superfly-live/stream/mp3` |
+| 1007 | SomaFM Seven Inch Soul | no | `http://ice3.somafm.com/7soul-128-mp3` |
+| 1008 | Solar Radio | no | `http://listen-msmn.sharp-stream.com/solarhigh.mp3` |
+| 1009 | Starpoint Radio | no | `http://stream2.hippynet.co.uk:8084/stream.mp3` |
+| 1010 | Generation Soul Disco Funk | yes | `https://gestream.fr/g-radio-hd.mp3` |
+| 1011 | The Face Radio | yes | `https://the-face-radio.radiocult.fm/stream` |
+| 1012 | Radio Swiss Pop | no | `http://stream.srg-ssr.ch/srgssr/rsp/aac/192` |
+| 1013 | WEFUNK Radio | no | `http://s-09.wefunkradio.com:8000/wefunk64.mp3` |
+| 1014 | hr1 | no | `http://dispatcher.rndfnk.com/hr/hr1/rheinmain/high` |
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
