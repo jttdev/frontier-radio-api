@@ -15,6 +15,9 @@ services:
     volumes:
       - ./data:/php-code/data
       - ./media:/php-code/media
+      # Vendored station logos, served at http://10.3.0.12/station-logos/.
+      # The original Frontier CDN is unreachable from this LAN; see README.
+      - ./station-logos:/php-code/station-logos:ro
     environment:
       CONF_DOMAIN: http://10.3.0.12/
       CONF_ALLOWED_DOMAIN: all
