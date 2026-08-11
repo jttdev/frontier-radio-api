@@ -1,0 +1,19 @@
+[Unit]
+Description=Probe Frontier Radio API for node_exporter textfile metrics
+Documentation=https://github.com/jttdev/frontier-radio-api/blob/main/deploy/minipc-germany-01/README.md
+After=frontier-radio-api.service
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/frontier-radio-api-health.sh
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/prometheus/node-exporter
+ProtectHome=true
+PrivateTmp=true
+PrivateDevices=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+LockPersonality=true

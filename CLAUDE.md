@@ -21,6 +21,8 @@ radios on the Germany home LAN.
 - Host: SSH alias `minipc-germany-01`, LAN address `10.3.0.12`.
 - Server checkout: `/home/janosch/frontier-radio-api`.
 - Container: `minipc-germany-01-radio-api-1`.
+- Boot/recovery owner: `frontier-radio-api.service`; it waits for the exact
+  `10.3.0.12` address, recreates the container, and verifies the XML endpoint.
 - HTTP and HTTPS bind only to `10.3.0.12`; no DNS service runs on the mini-PC.
 - Management UI: `http://10.3.0.12/gui/`.
 - Both physical radios are merged into one shared GUI profile and therefore
@@ -209,7 +211,8 @@ and rebuild on the mini-PC. Never copy tracked source files directly.
 ssh -o BatchMode=yes minipc-germany-01 '
   cd /home/janosch/frontier-radio-api &&
   git pull --ff-only &&
-  docker compose -f deploy/minipc-germany-01/compose.yaml up -d --build
+  docker compose -f deploy/minipc-germany-01/compose.yaml build radio-api &&
+  sudo deploy/minipc-germany-01/install-service.sh
 '
 ```
 
@@ -223,7 +226,8 @@ dig @10.3.0.1 hama.wifiradiofrontier.com A +short
 dig @10.3.0.1 pri.logon.wifiradiofrontier.com A +short
 curl -fsS http://10.3.0.12/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0
 ssh -o BatchMode=yes minipc-germany-01 \
-  'docker ps --filter name=minipc-germany-01-radio-api-1'
+  'systemctl is-active frontier-radio-api.service frontier-radio-api-health.timer &&
+   docker ps --filter name=minipc-germany-01-radio-api-1'
 ```
 
 See `deploy/minipc-germany-01/README.md` for the canonical deployment runbook.
