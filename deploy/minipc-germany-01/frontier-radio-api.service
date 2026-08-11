@@ -1,0 +1,27 @@
+[Unit]
+Description=Frontier Radio API on the Germany mini-PC
+Documentation=https://github.com/jttdev/frontier-radio-api/blob/main/deploy/minipc-germany-01/README.md
+Requires=docker.service network-online.target
+After=docker.service network-online.target
+PartOf=docker.service
+# The service must keep retrying if the LAN address is delayed after a site-wide
+# power restoration. network-online.target is not sufficient on this host.
+StartLimitIntervalSec=0
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+WorkingDirectory=/home/janosch/frontier-radio-api
+ExecStartPre=/bin/sh -c 'for i in $(seq 1 60); do /usr/sbin/ip -4 -o addr show | /usr/bin/grep -q " 10\\.3\\.0\\.12/" && exit 0; /usr/bin/sleep 1; done; echo "Frontier Radio API bind address 10.3.0.12 not present after 60s" >&2; exit 1'
+# Docker can leave a restored container running without networks or published
+# ports after a pre-DHCP bind failure. Recreate it after the address exists.
+ExecStart=/usr/bin/docker compose -f deploy/minipc-germany-01/compose.yaml up -d --force-recreate --no-build radio-api
+ExecStartPost=/bin/sh -c 'for i in $(seq 1 30); do /usr/bin/curl -fsS --max-time 3 "http://10.3.0.12/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0" 2>/dev/null | /usr/bin/grep -Eq "^<EncryptedToken>[[:xdigit:]]+</EncryptedToken>$" && exit 0; /usr/bin/sleep 1; done; echo "Frontier Radio API XML endpoint did not become ready after 30s" >&2; exit 1'
+ExecStop=/usr/bin/docker compose -f deploy/minipc-germany-01/compose.yaml stop radio-api
+Restart=on-failure
+RestartSec=5s
+TimeoutStartSec=120s
+TimeoutStopSec=30s
+
+[Install]
+WantedBy=multi-user.target
