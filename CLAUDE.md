@@ -25,7 +25,7 @@ radios on the Germany home LAN.
   `10.3.0.12` address, recreates the container, and verifies the XML endpoint.
 - HTTP and HTTPS bind only to `10.3.0.12`; no DNS service runs on the mini-PC.
 - Management UI: `http://10.3.0.12/gui/`.
-- Both physical radios are merged into one shared GUI profile and therefore
+- All physical radios use one shared GUI profile and therefore
   receive the same favorites. Do not commit GUI codes or radio auth tokens.
 - Runtime state is file-backed JSON under ignored
   `deploy/minipc-germany-01/data/`; cached logos and generated TLS material live
@@ -40,6 +40,7 @@ The Germany UDM resolves only these compiled-in directory hosts to
 - `hama2.wifiradiofrontier.com`
 - `pri.logon.wifiradiofrontier.com`
 - `airable.wifiradiofrontier.com`
+- `www.mediayou.net` (MediaYou favorites only; keep `data2.mediayou.net` public)
 
 Do not override `time.wifiradiofrontier.com` or
 `update.wifiradiofrontier.com`; the radios still use the public services for
@@ -51,6 +52,7 @@ time and firmware updates.
 | --- | --- | --- | --- |
 | Auna NE-6146T11 | `00226141ED60` / `00:22:61:41:ed:60` | `10.3.101.133` | legacy XML, `/setupapp/fs/`, `fver=4` |
 | Hama DIT2000M | `002261336690` / `00:22:61:33:66:90` | `10.3.103.49` | legacy XML, `/setupapp/hama/`, `fver=6`, `ven=hama12` |
+| Auna IR-130 (`10009125`) | `ACA2132A1A7A` / `ac:a2:13:2a:1a:7a` | `10.3.101.111` | MediaYou, `/embedded/GetMyMediaU_sn4.asp` |
 
 The Auna reports firmware `ir-mmi-FS2026-0500-0429` / `2.9.10.EX63197-1A1`.
 The Hama reports `3.139-gb28882e8`. IPs are operational observations; verify
@@ -73,6 +75,10 @@ The short-lived “Access Code” displayed by original Airable/Nuvola firmware
 belongs to the upstream portal and is not the Radio-API GUI code. A device's
 previous association with the original portal does not matter after the exact
 directory hostname is redirected locally.
+
+Magic Systech/MediaYou radios are separate from both Frontier protocols. Their
+`SER2` value is the 12-hex physical Wi-Fi MAC. Map it to a shared profile with
+`CONF_MEDIAYOU_DEVICES`; do not add it to the Frontier identity table.
 
 To put another device on the shared favorites, let it register locally, log
 into its newly generated GUI code, then use the supported GUI **Merge** form

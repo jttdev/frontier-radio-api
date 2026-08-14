@@ -78,6 +78,10 @@ define(
 	'ENV_LEGACY_NEXTCLOUD',
 		!empty($ENV['CONF_LEGACY_NEXTCLOUD']) && $ENV['CONF_LEGACY_NEXTCLOUD'] == 'true'
 );
+define(
+	'ENV_MEDIAYOU_DEVICES',
+	!empty($ENV['CONF_MEDIAYOU_DEVICES']) ? strval($ENV['CONF_MEDIAYOU_DEVICES']) : ''
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -156,6 +160,11 @@ class Config {
 	 * Nextcloud version 31.0.0 changes how files can be downloaded from shares, use the old way required by older version of Nextcloud servers?
 	 */
 	const LEGACY_NEXTCLOUD = ENV_LEGACY_NEXTCLOUD;
+
+	/**
+	 * Comma-separated MediaYou serial-to-profile mappings (SERIAL=ID).
+	 */
+	const MEDIAYOU_DEVICES = ENV_MEDIAYOU_DEVICES;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS
