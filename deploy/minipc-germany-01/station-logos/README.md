@@ -10,6 +10,7 @@ scaled-down press logo.
 
 | File | Station | Original CDN path |
 | --- | --- | --- |
+| `1live.png` | 1LIVE | `/assets/150x150/72/79/743482.png` |
 | `asiafm-cantonese.png` | AsiaFM Cantonese | `/assets/150x150/13/23/935350.png` |
 | `die-maus.png` | Die Maus | `/assets/150x150/81/32/635517.png` |
 | `hr1.png` | hr1 | `/assets/150x150/37/52/196638.png` |

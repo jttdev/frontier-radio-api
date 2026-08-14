@@ -113,6 +113,7 @@ plain HTTP.
 | 1012 | Radio Swiss Pop | no | `http://stream.srg-ssr.ch/srgssr/rsp/aac/192` |
 | 1013 | WEFUNK Radio | no | `http://s-09.wefunkradio.com:8000/wefunk64.mp3` |
 | 1014 | hr1 | no | `http://dispatcher.rndfnk.com/hr/hr1/rheinmain/high` |
+| 1015 | 1LIVE | no | `http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3` |
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
