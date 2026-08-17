@@ -27,6 +27,9 @@ radios on the Germany home LAN.
 - Management UI: `http://10.3.0.12/gui/`.
 - All physical radios use one shared GUI profile and therefore
   receive the same favorites. Do not commit GUI codes or radio auth tokens.
+- `CONF_FORCE_LANGUAGE: ger` serves the directory in German to every radio.
+  The devices ask for English (`dlang=eng`) whatever language their own UI is
+  set to, so without it the menu renders in English.
 - Runtime state is file-backed JSON under ignored
   `deploy/minipc-germany-01/data/`; cached logos and generated TLS material live
   under ignored `deploy/minipc-germany-01/media/`. Never commit either directory.
@@ -131,6 +134,7 @@ plain HTTP.
 | 1013 | WEFUNK Radio | no | `http://s-09.wefunkradio.com:8000/wefunk64.mp3` |
 | 1014 | hr1 | no | `http://dispatcher.rndfnk.com/hr/hr1/rheinmain/high` |
 | 1015 | 1LIVE | no | `http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3` |
+| 1016 | Radio Swiss Classic | no | `http://stream.srg-ssr.ch/srgssr/rsc_de/aac/192` |
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.
@@ -140,9 +144,14 @@ reordered.
 - Use the GUI where possible. A radio-list POST replaces the entire list;
   scripted updates must submit every existing row plus the new/changed rows,
   or they silently delete the omitted stations.
-- Put shared stations in a category named exactly `Favorites` (or the
-  German-supported `Favoriten`). That category is promoted to the radio's top
-  level.
+- Put shared stations in a category named exactly `Favoriten` (or the English
+  `Favorites`). That category is promoted to the radio's top level. This
+  deployment uses `Favoriten`, because the category name is data and is not
+  translated — unlike the surrounding menu, which `CONF_FORCE_LANGUAGE`
+  handles. Keep every row on one spelling. A list mixing both promotes only
+  `Favoriten` to the top level, leaving the `Favorites` rows reachable just one
+  level deeper under `Radiosender`, while MediaYou puts both under a single
+  folder — so the two protocols disagree about what "favorites" contains.
 - Use short ASCII display names for maximum firmware and GUI compatibility.
   `Inner::filterName()` strips characters outside its limited Unicode range;
   Chinese station names can be lost.
@@ -218,7 +227,7 @@ reordered.
 5. Reopen Station List so Radio-API registers the real XML token/RID and
    exposes a local GUI code.
 6. Merge the new local profile into the shared profile through the GUI.
-7. Verify the physical device—not a simulated curl—fetches `Favorites`,
+7. Verify the physical device—not a simulated curl—fetches `Favoriten`,
    searches a station ID, and starts playback.
 
 For an empty favorites list, first verify the physical request path. The Auna
@@ -230,8 +239,9 @@ A radio that reaches this server but is not yet merged shows a characteristic
 log signature: `loginXML.asp?token=0` immediately followed by
 `Search.asp?sSearchtype=3&Search=<16-digit id>`, repeating. That long numeric
 is an upstream Frontier station ID left in the device's stored presets; the
-local directory has no such ID and answers `No item found for this ID!` (local
-station IDs are the 1000–2999 range). It means the identity registered under
+local directory has no such ID and answers `Kein Eintrag zu dieser ID gefunden!`
+(`No item found for this ID!` without `CONF_FORCE_LANGUAGE`; local station IDs
+are the 1000–2999 range). It means the identity registered under
 its own empty profile — merge it, then re-save the presets on the device,
 because the old preset slots keep pointing at the dead upstream IDs.
 
