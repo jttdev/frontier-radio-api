@@ -221,7 +221,7 @@ class OutputJSON extends Output {
 					'service',
 					'radio'
 				],
-				'title' => 'Radio',
+				'title' => $this->cleanText('Radio', true),
 				'url' => $this->cleanUrl(Config::RADIO_DOMAIN . 'index')
 			)
 		);
@@ -237,7 +237,7 @@ class OutputJSON extends Output {
 					'service',
 					'feed'
 				],
-				'title' => 'Podcast',
+				'title' => $this->cleanText('Podcast', true),
 				'url' => $this->cleanUrl(Config::RADIO_DOMAIN . 'index')
 			)
 		);
