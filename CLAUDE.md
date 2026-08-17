@@ -54,17 +54,18 @@ time and firmware updates.
 | Hama DIT2000M | `002261336690` / `00:22:61:33:66:90` | `10.3.103.49` | legacy XML, `/setupapp/hama/`, `fver=6`, `ven=hama12` |
 | Auna IR-130 (`10009125`) | `ACA2132A1A7A` / `ac:a2:13:2a:1a:7a` | `10.3.101.111` | MediaYou, `/embedded/GetMyMediaU_sn4.asp` |
 | Auna Radio Gaga (`10022781`) | `00226126DD38` / `00:22:61:26:dd:38` | `10.3.103.224` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
-| Auna, model unconfirmed | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
+| Auna Worldwide Stereo (`10031867`) | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
 
 The NE-6146T11 reports firmware `ir-mmi-FS2026-0500-0429` /
 `2.9.10.EX63197-1A1`. The Hama reports `3.139-gb28882e8`. IPs are operational
 observations; verify them in UniFi before filtering logs or captures. The
 legacy XML protocol carries no model string — only `ven` and `fver` — so a
-model name has to be read off the device information screen; UniFi shows this
-device only as `InternetRadio` with the Frontier Silicon OUI.
+model name has to be read off the device information screen or matched from
+the Auna article number; UniFi reports the Worldwide Stereo only as
+`InternetRadio` with the Frontier Silicon OUI.
 
 The legacy-XML Auna models use two different vendor paths — the NE-6146T11
-takes `/setupapp/fs/`, the Radio Gaga and the `ven=una10` model
+takes `/setupapp/fs/`, the Radio Gaga and the Worldwide Stereo
 `/setupapp/auna/` — so a log filter written for one will silently miss the
 other. All paths are served by the same host records, which are already
 redirected, so a further Auna model needs no DNS work.
