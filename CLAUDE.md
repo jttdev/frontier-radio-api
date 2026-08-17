@@ -54,16 +54,25 @@ time and firmware updates.
 | Hama DIT2000M | `002261336690` / `00:22:61:33:66:90` | `10.3.103.49` | legacy XML, `/setupapp/hama/`, `fver=6`, `ven=hama12` |
 | Auna IR-130 (`10009125`) | `ACA2132A1A7A` / `ac:a2:13:2a:1a:7a` | `10.3.101.111` | MediaYou, `/embedded/GetMyMediaU_sn4.asp` |
 | Auna Radio Gaga (`10022781`) | `00226126DD38` / `00:22:61:26:dd:38` | `10.3.103.224` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
+| Auna, model unconfirmed | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
 
 The NE-6146T11 reports firmware `ir-mmi-FS2026-0500-0429` /
 `2.9.10.EX63197-1A1`. The Hama reports `3.139-gb28882e8`. IPs are operational
-observations; verify them in UniFi before filtering logs or captures.
+observations; verify them in UniFi before filtering logs or captures. The
+legacy XML protocol carries no model string — only `ven` and `fver` — so a
+model name has to be read off the device information screen; UniFi shows this
+device only as `InternetRadio` with the Frontier Silicon OUI.
 
-The two legacy-XML Auna models use different vendor paths — the NE-6146T11
-takes `/setupapp/fs/`, the Radio Gaga `/setupapp/auna/` with `ven=una1` — so a
-log filter written for one will silently miss the other. Both paths are served
-by the same host records, which are already redirected, so a further Auna model
-needs no DNS work.
+The legacy-XML Auna models use two different vendor paths — the NE-6146T11
+takes `/setupapp/fs/`, the Radio Gaga and the `ven=una10` model
+`/setupapp/auna/` — so a log filter written for one will silently miss the
+other. All paths are served by the same host records, which are already
+redirected, so a further Auna model needs no DNS work.
+
+Anchor `ven` matches: `ven=una1` is a prefix of `ven=una10`, so a substring
+filter for the Radio Gaga also catches the newer model and an exact-match
+filter for `una1` silently drops it. Grep for `ven=una1&` / `ven=una1$` or the
+full `ven=una10` when separating the two.
 
 ## Identity model
 
@@ -215,6 +224,32 @@ For an empty favorites list, first verify the physical request path. The Auna
 uses `pri.logon.wifiradiofrontier.com`, while the Hama uses the `hama`/`hama2`
 hosts. Correct data under an identity that never reaches this server has no
 effect.
+
+A radio that reaches this server but is not yet merged shows a characteristic
+log signature: `loginXML.asp?token=0` immediately followed by
+`Search.asp?sSearchtype=3&Search=<16-digit id>`, repeating. That long numeric
+is an upstream Frontier station ID left in the device's stored presets; the
+local directory has no such ID and answers `No item found for this ID!` (local
+station IDs are the 1000–2999 range). It means the identity registered under
+its own empty profile — merge it, then re-save the presets on the device,
+because the old preset slots keep pointing at the dead upstream IDs.
+
+Step 6 can be driven without a browser, since `CONF_ALLOWED_DOMAIN=all` leaves
+the GUI on a plain session cookie. This still goes through the supported merge
+form and `Id::mergeRadios()`, not a hand-edit of `table.json`:
+
+```bash
+ssh -o BatchMode=yes minipc-germany-01 '
+  J=$(mktemp)
+  curl -sS -c "$J" -b "$J" -X POST -d "code=<NEW_CODE>" "http://10.3.0.12/gui/?login" -o /dev/null
+  curl -sS -c "$J" -b "$J" -X POST -d "active=yes" -d "code=<SHARED_CODE>" \
+    "http://10.3.0.12/gui/?merge" | grep -oE "color:(green|red);\">[^<]*"
+  rm -f "$J"'
+```
+
+Expect `Merge set!`. Confirm by fetching `?go=initial` as the new device's
+`mac=` token: the last menu entry must read `GUI-Code: <SHARED_CODE>`, which is
+the cheapest proof that the identity now resolves to the shared profile.
 
 ## Deploy and verify
 
