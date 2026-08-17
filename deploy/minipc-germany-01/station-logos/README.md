@@ -15,6 +15,7 @@ scaled-down press logo.
 | `die-maus.png` | Die Maus | `/assets/150x150/81/32/635517.png` |
 | `hr1.png` | hr1 | `/assets/150x150/37/52/196638.png` |
 | `kcea-big-band.png` | KCEA 89.1 Big Band | `/assets/150x150/45/86/956155.png` |
+| `radio-swiss-classic.png` | Radio Swiss Classic | `/assets/150x150/04/24/890942.png` |
 | `radio-swiss-jazz.png` | Radio Swiss Jazz | `/assets/150x150/81/30/775522.png` |
 | `radio-swiss-pop.png` | Radio Swiss Pop | `/assets/150x150/29/07/458975.png` |
 | `solar-radio.png` | Solar Radio | `/assets/150x150/16/63/420280.png` |

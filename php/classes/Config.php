@@ -82,6 +82,10 @@ define(
 	'ENV_MEDIAYOU_DEVICES',
 	!empty($ENV['CONF_MEDIAYOU_DEVICES']) ? strval($ENV['CONF_MEDIAYOU_DEVICES']) : ''
 );
+define(
+	'ENV_FORCE_LANGUAGE',
+	!empty($ENV['CONF_FORCE_LANGUAGE']) ? strval($ENV['CONF_FORCE_LANGUAGE']) : ''
+);
 
 // IP on reverse proxy setup
 if( !empty($_SERVER['HTTP_X_REAL_IP']) ){
@@ -165,6 +169,12 @@ class Config {
 	 * Comma-separated MediaYou serial-to-profile mappings (SERIAL=ID).
 	 */
 	const MEDIAYOU_DEVICES = ENV_MEDIAYOU_DEVICES;
+
+	/**
+	 * One of Output::ALL_LANGUAGES ('eng', 'ger') to serve every radio in that
+	 * language, ignoring the one the device asks for. Empty follows the device.
+	 */
+	const FORCE_LANGUAGE = ENV_FORCE_LANGUAGE;
 
 	/**
 	 * Store redis cache for ALLOWED_DOMAINS

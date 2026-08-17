@@ -85,6 +85,7 @@ The image of [Radio DNS](https://hub.docker.com/r/kimbtechnologies/radio_dns) is
 		- `CONF_USE_LOGO_CACHE` (optional, default `false`) Cache logos of radio stations. This will make sure logos are served without https and convert svg files to png (assuming [`rsvg-convert`](https://pkgs.alpinelinux.org/package/v3.19/community/x86_64/rsvg-convert) is available on system). Logos are stored in `./media/`.
 		- `CONF_FAVORITE_ITEMS` (optional, default empty) Comma separated list of items to be favorites and shown on top of list by radio, e.g.,  `Radio,Radio-Browser`
 		- `CONF_LEGACY_NEXTCLOUD` (optional, default `false`) Set to `true` if your are using Nextcloud streams and the Nextcloud server is running a version below 31
+		- `CONF_FORCE_LANGUAGE` (optional, default empty) Set to `eng` or `ger` to serve the directory in that language to every radio, ignoring the language the device requests (`dlang` for XML radios, `Accept-Language` for JSON radios). Empty follows the device.
 		- **Attention:** Optional parameters have a leading `____` in the default `env.json`, make sure to remove them.
 		- The `CONF_REDIS_*` values are ignored and `CONF_USE_JSON_CACHE` is always `true`.
 	- Make sure, that *Radio-API* is available at port `80` (and `443` for newer JSON-based radios) for requests with the hostname `*.wifiradiofrontier.com` and `CONF_DOMAIN`.

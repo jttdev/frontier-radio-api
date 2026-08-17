@@ -27,5 +27,7 @@ services:
       CONF_STREAM_JSON: "false"
       CONF_USE_LOGO_CACHE: "true"
       CONF_FAVORITE_ITEMS: Radio,Radio-Browser
+      # The radios request dlang=eng; serve the directory in German regardless.
+      CONF_FORCE_LANGUAGE: ger
       # Magic Systech MediaYou serial (Wi-Fi MAC) -> shared Radio-API profile.
       CONF_MEDIAYOU_DEVICES: "ACA2132A1A7A=2"

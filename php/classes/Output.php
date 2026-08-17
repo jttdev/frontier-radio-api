@@ -61,15 +61,27 @@ abstract class Output {
 		'Top Click' => ['Top Click', 'Am meisten gehört'],
 		'Top Vote' => ['Top Vote', 'Am höchsten bewertet'],
 		'Next Page' => ['Next Page', 'Nächste Seite'],
-		'You do not have last stations.' => ['You do not have last stations.', 'Sie haben keine zuletzt gehörten Sender!']
+		'You do not have last stations.' => ['You do not have last stations.', 'Sie haben keine zuletzt gehörten Sender!'],
+		//
+		'No item found for this ID!' => ['No item found for this ID!', 'Kein Eintrag zu dieser ID gefunden!'],
+		'No item found for this tID or Category!' => ['No item found for this tID or Category!', 'Kein Eintrag zu dieser tID oder Kategorie gefunden!']
 	);
 
 	/**
 	 * Create Outputter
 	 */
 	public function __construct(){
-		$this->language = $this->detectLanguage();
+		$this->language = self::forcedLanguage() ?? $this->detectLanguage();
 		$this->logo = new RadioLogo();
+	}
+
+	/**
+	 * The language index pinned by Config::FORCE_LANGUAGE,
+	 * 	or null when the language requested by the device applies.
+	 */
+	private static function forcedLanguage() : ?int {
+		$lang = array_search( Config::FORCE_LANGUAGE, self::ALL_LANGUAGES, true );
+		return $lang === false ? null : $lang;
 	}
 
 	abstract protected function detectLanguage() : int;
