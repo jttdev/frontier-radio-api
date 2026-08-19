@@ -54,18 +54,23 @@ time and firmware updates.
 | Device | Radio ID / Wi-Fi MAC | Current IP | Protocol |
 | --- | --- | --- | --- |
 | Auna NE-6146T11 | `00226141ED60` / `00:22:61:41:ed:60` | `10.3.101.133` | legacy XML, `/setupapp/fs/`, `fver=4` |
+| Auna NE-6146T11 | `002261963228` / `00:22:61:96:32:28` | `10.3.101.29` | legacy XML, `/setupapp/fs/`, `fver=4` |
 | Hama DIT2000M | `002261336690` / `00:22:61:33:66:90` | `10.3.103.49` | legacy XML, `/setupapp/hama/`, `fver=6`, `ven=hama12` |
 | Auna IR-130 (`10009125`) | `ACA2132A1A7A` / `ac:a2:13:2a:1a:7a` | `10.3.101.111` | MediaYou, `/embedded/GetMyMediaU_sn4.asp` |
 | Auna Radio Gaga (`10022781`) | `00226126DD38` / `00:22:61:26:dd:38` | `10.3.103.224` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
 | Auna Worldwide Stereo (`10031867`) | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
 
-The NE-6146T11 reports firmware `ir-mmi-FS2026-0500-0429` /
-`2.9.10.EX63197-1A1`. The Hama reports `3.139-gb28882e8`. IPs are operational
-observations; verify them in UniFi before filtering logs or captures. The
-legacy XML protocol carries no model string — only `ven` and `fver` — so a
-model name has to be read off the device information screen or matched from
-the Auna article number; UniFi reports the Worldwide Stereo only as
-`InternetRadio` with the Frontier Silicon OUI.
+Two NE-6146T11 units are in service; they are identical in protocol and
+differ only by radio ID. The NE-6146T11 reports firmware
+`ir-mmi-FS2026-0500-0429` / `2.9.10.EX63197-1A1`. The Hama reports
+`3.139-gb28882e8`. IPs are operational observations; verify them in UniFi
+before filtering logs or captures. The legacy XML protocol carries no model
+string — only `ven` and `fver` — so a model name generally has to be read off
+the device information screen or matched from the Auna article number. The
+exception is the NE-6146T11, which announces a DHCP hostname of
+`NE-6146T11 <radio-id>`: UniFi therefore names the model and the radio ID
+together, without touching the device. Other models do not — the Worldwide
+Stereo appears only as `InternetRadio` with the Frontier Silicon OUI.
 
 The legacy-XML Auna models use two different vendor paths — the NE-6146T11
 takes `/setupapp/fs/`, the Radio Gaga and the Worldwide Stereo
