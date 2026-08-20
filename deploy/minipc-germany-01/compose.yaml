@@ -30,4 +30,4 @@ services:
       # The radios request dlang=eng; serve the directory in German regardless.
       CONF_FORCE_LANGUAGE: ger
       # Magic Systech MediaYou serial (Wi-Fi MAC) -> shared Radio-API profile.
-      CONF_MEDIAYOU_DEVICES: "ACA2132A1A7A=2"
+      CONF_MEDIAYOU_DEVICES: "ACA2132A1A7A=2,28A1EBFD12B8=2"
