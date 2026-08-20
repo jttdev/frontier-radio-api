@@ -25,8 +25,10 @@ radios on the Germany home LAN.
   `10.3.0.12` address, recreates the container, and verifies the XML endpoint.
 - HTTP and HTTPS bind only to `10.3.0.12`; no DNS service runs on the mini-PC.
 - Management UI: `http://10.3.0.12/gui/`.
-- All physical radios use one shared GUI profile and therefore
-  receive the same favorites. Do not commit GUI codes or radio auth tokens.
+- Every radio that browses a directory uses one shared GUI profile and
+  therefore receives the same favorites. The Skytune unit is the exception: it
+  browses nothing and holds its own synced copy of the list (see "Skytune
+  radios"). Do not commit GUI codes or radio auth tokens.
 - `CONF_FORCE_LANGUAGE: ger` serves the directory in German to every radio.
   The devices ask for English (`dlang=eng`) whatever language their own UI is
   set to, so without it the menu renders in English.
@@ -157,7 +159,9 @@ files manually.
 ## Current shared favorites
 
 The live GUI/runtime data is the source of truth; verify it before making a
-scripted update. The current baseline is:
+scripted update. Changing this list also means re-running
+`sync-skytune-presets.sh`, which does not follow along on its own. The current
+baseline is:
 
 Every station carries vendored artwork from
 `deploy/minipc-germany-01/station-logos/`. The two TLS-only streams need
