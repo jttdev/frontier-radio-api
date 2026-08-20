@@ -57,6 +57,7 @@ time and firmware updates.
 | Auna NE-6146T11 | `002261963228` / `00:22:61:96:32:28` | `10.3.101.29` | legacy XML, `/setupapp/fs/`, `fver=4` |
 | Hama DIT2000M | `002261336690` / `00:22:61:33:66:90` | `10.3.103.49` | legacy XML, `/setupapp/hama/`, `fver=6`, `ven=hama12` |
 | Auna IR-130 (`10009125`) | `ACA2132A1A7A` / `ac:a2:13:2a:1a:7a` | `10.3.101.111` | MediaYou, `/embedded/GetMyMediaU_sn4.asp` |
+| Auna IR-130 (`10009125`, Skytune) | `28A1EBFD12B8` / `28:a1:eb:fd:12:b8` | `10.3.101.7` | Skytune, device-local presets, no portal |
 | Auna Radio Gaga (`10022781`) | `00226126DD38` / `00:22:61:26:dd:38` | `10.3.103.224` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
 | Auna Worldwide Stereo (`10031867`) | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
 
@@ -83,6 +84,41 @@ filter for the Radio Gaga also catches the newer model and an exact-match
 filter for `una1` silently drops it. Grep for `ven=una1&` / `ven=una1$` or the
 full `ven=una10` when separating the two.
 
+The article number does not determine the protocol. Two units carry Auna
+article `10009125`: the older one speaks MediaYou, the newer one ships Skytune
+firmware and has no MediaYou menu at all. They are told apart by Wi-Fi OUI —
+`ac:a2:13` for the MediaYou unit, `28:a1:eb` (Etek Technology) for the Skytune
+one, which announces the DHCP hostname `iRadio-<last-6-hex>`. Identify a new
+radio from what it actually requests, not from the article number.
+
+## Skytune radios
+
+Skytune is the successor to the MediaYou/mediaU portal on the Magic Systech
+family. There is nothing to redirect: the firmware keeps its favorites in a
+device-local preset store instead of fetching a directory, so it never
+contacts this server for browsing and no DNS record applies to it. The store
+is edited over plain HTTP on the radio itself, which serves a frameset
+"DEVICE MANAGEMENT" UI on port 80:
+
+- `GET /cgi-bin/EN/cgi?CL=0` lists presets; each row's name and URL sit in
+  `readonly` inputs, so read them from the raw HTML, not the rendered text.
+- `POST /cgi-bin/EN/cgi?CA=0;CI=<index>` appends one preset
+  (`channel_name`, `channel_url`; 47 and 255 characters).
+- `GET /cgi-bin/EN/cgi?CD=0;CI=<index>` deletes one preset. Indices are
+  0-based and the list closes up after each delete, so repeatedly deleting
+  index 0 empties it.
+
+`deploy/minipc-germany-01/sync-skytune-presets.sh <radio-ip> <serial>` mirrors
+the shared list onto such a radio; re-run it on the mini-PC after every
+favorites change, since the device holds its own copy and nothing syncs it
+back. The radio displays presets in stored order, so the script sorts them
+case-insensitively by name. Stations flagged `proxy` are pointed at
+`mediayou.php?action=stream`, which needs the radio's serial in
+`CONF_MEDIAYOU_DEVICES` even though it never browses the MediaYou directory;
+the rest get the same direct stream URLs the Frontier radios use. Station IDs
+in those proxy URLs come from the position in the stored list, so re-run the
+script after reordering `radios_2.json`, not just after adding a station.
+
 ## Identity model
 
 Do not conflate these identifiers:
@@ -103,7 +139,10 @@ directory hostname is redirected locally.
 
 Magic Systech/MediaYou radios are separate from both Frontier protocols. Their
 `SER2` value is the 12-hex physical Wi-Fi MAC. Map it to a shared profile with
-`CONF_MEDIAYOU_DEVICES`; do not add it to the Frontier identity table.
+`CONF_MEDIAYOU_DEVICES`; do not add it to the Frontier identity table. Skytune
+radios reuse that same 12-hex Wi-Fi MAC as their serial, but only to authorize
+the stream proxy — they generate no GUI code and get no `table.json` entry,
+because they never register.
 
 To put another device on the shared favorites, let it register locally, log
 into its newly generated GUI code, then use the supported GUI **Merge** form
