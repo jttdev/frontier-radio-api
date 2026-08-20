@@ -59,10 +59,15 @@ time and firmware updates.
 | Auna IR-130 (`10009125`) | `ACA2132A1A7A` / `ac:a2:13:2a:1a:7a` | `10.3.101.111` | MediaYou, `/embedded/GetMyMediaU_sn4.asp` |
 | Auna IR-130 (`10009125`, Skytune) | `28A1EBFD12B8` / `28:a1:eb:fd:12:b8` | `10.3.101.7` | Skytune, device-local presets, no portal |
 | Auna Radio Gaga (`10022781`) | `00226126DD38` / `00:22:61:26:dd:38` | `10.3.103.224` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
+| Auna Radio Gaga (`10022781`) | `002261F9D326` / `00:22:61:f9:d3:26` | `10.3.103.214` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
 | Auna Worldwide Stereo (`10031867`) | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
 
-Two NE-6146T11 units are in service; they are identical in protocol and
-differ only by radio ID. The NE-6146T11 reports firmware
+Two NE-6146T11 units and two Radio Gaga units are in service; the pair-mates
+are identical in protocol and differ only by identity. The two Radio Gagas sit
+at adjacent addresses, `10.3.103.224` and `10.3.103.214`, so read an IP twice
+before filtering on it. Neither Radio Gaga's radio ID was read off its device
+screen; both are the Wi-Fi MAC, which is the pattern every other row follows,
+because a legacy-XML registration transmits only the `mac=` token. The NE-6146T11 reports firmware
 `ir-mmi-FS2026-0500-0429` / `2.9.10.EX63197-1A1`. The Hama reports
 `3.139-gb28882e8`. IPs are operational observations; verify them in UniFi
 before filtering logs or captures. The legacy XML protocol carries no model
