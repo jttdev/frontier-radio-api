@@ -13,12 +13,18 @@
 # radios fetch them.
 #
 # Usage: sync-skytune-presets.sh <radio-ip> <mediayou-serial>
+#
+# Defaults to this Germany instance. For a radio at YJ Janosch Home, run it in
+# CT 103 against that instance (its list is synced from here):
+#   RADIO_API_BASE=http://10.18.0.13 \
+#   RADIO_API_DATA=/opt/frontier-radio-api/deploy/yj-janosch-home/data/radios_2.json \
+#   deploy/minipc-germany-01/sync-skytune-presets.sh <radio-ip> <serial>
 set -euo pipefail
 
 RADIO_IP="${1:?usage: $0 <radio-ip> <mediayou-serial>}"
 SERIAL="${2:?usage: $0 <radio-ip> <mediayou-serial>}"
-DATA="$(dirname "$(readlink -f "$0")")/data/radios_2.json"
-BASE="http://10.3.0.12"
+DATA="${RADIO_API_DATA:-$(dirname "$(readlink -f "$0")")/data/radios_2.json}"
+BASE="${RADIO_API_BASE:-http://10.3.0.12}"
 CGI="http://${RADIO_IP}/cgi-bin/EN/cgi"
 
 [ -r "$DATA" ] || { echo "no shared station list at $DATA" >&2; exit 1; }

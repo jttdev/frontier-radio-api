@@ -81,6 +81,11 @@ if [ -n "$changes" ] || [ ! -s "$DATA/table.json" ]; then
     # shellcheck disable=SC2086
     rsync -rc --delete --chown=82:82 --chmod=F644 $FILTER \
         "$STATE/incoming/" "$DATA/"
+    # Station logos are vendored in the repo and served by each instance;
+    # Germany's list points them at 10.3.0.12, unreachable from here.
+    find "$DATA" -maxdepth 1 -name 'radios_*.json' -exec sed -i \
+        's|http:\\/\\/10\.3\.0\.12\\/station-logos\\/|http:\\/\\/10.18.0.13\\/station-logos\\/|g' {} + \
+        -exec chown 82:82 {} +
     # shellcheck disable=SC2086
     rsync -rc --delete $FILTER "$STATE/incoming/" "$STATE/pulled/"
     find "$DATA/cache" -mindepth 1 -delete 2>/dev/null || true

@@ -30,13 +30,33 @@ restarts the container. A radio that first contacts this instance registers in
 the local `table.json` and keeps working until Germany's state next changes;
 for a permanent entry, register the radio against the Germany instance.
 
+Station logo URLs in the lists point at `http://10.3.0.12/station-logos/`; the
+apply rewrites them to `10.18.0.13`, which serves the same vendored files from
+`../minipc-germany-01/station-logos/`. A newly vendored logo therefore needs a
+`git pull` in CT 103 as well.
+
 Not synced, per instance: `env.json`, the generated TLS pair, `cache/`, logs,
 and `media/`.
 
 The `CONF_MEDIAYOU_DEVICES` map in `compose.yaml` matches Germany's, so an
 IR-130 keeps its profile on either site. The Skytune unit holds device-local
-presets pushed by `../minipc-germany-01/sync-skytune-presets.sh`, which runs
-against the Germany LAN only.
+presets pushed by `../minipc-germany-01/sync-skytune-presets.sh`; once it is
+here, push them from CT 103 against this instance after a list change:
+
+```bash
+RADIO_API_BASE=http://10.18.0.13 \
+RADIO_API_DATA=/opt/frontier-radio-api/deploy/yj-janosch-home/data/radios_2.json \
+deploy/minipc-germany-01/sync-skytune-presets.sh <radio-ip> 28A1EBFD12B8
+```
+
+## Moving a radio from Germany
+
+Nothing to change on the radio or in either Radio-API: its registration and
+profile are already in the synced `table.json`. Join it to `tdmt_main`, and
+after it first appears give it a fixed lease in
+`infra-configs/unifi/sites/yj-janosch-home/main.tf` `clients` (note the radio
+ID, as in the Germany table in the repo `CLAUDE.md`). A Skytune unit then needs
+the preset push above.
 
 ## Network
 

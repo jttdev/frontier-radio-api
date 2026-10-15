@@ -2,7 +2,7 @@
 
 Fork of `KIMB-technologies/Radio-API` providing a self-hosted Frontier
 Silicon/Nuvola directory and shared favorites for the Auna and Hama internet
-radios on the Germany home LAN.
+radios on the Germany home LAN and at YJ Janosch Home (China).
 
 ## Repositories and ownership
 
@@ -12,6 +12,11 @@ radios on the Germany home LAN.
 - Keep upstream-facing application changes separable where practical.
 - `php/`, `utils/`: upstream application and container source.
 - `deploy/minipc-germany-01/`: production Compose stack and deployment runbook.
+- `deploy/yj-janosch-home/`: second instance in CT 103 `utility-yj-janosch-home`
+  (`10.18.0.13`), which pulls `table.json` and the lists from Germany every
+  5 minutes. Germany is the master for favorites; runbook in its `README.md`.
+  China DNS for the directory hosts is the Mihomo gw's `hosts:` block
+  (`infra-configs/proxy-rules/mihomo/yj-janosch-home.yaml`), not the UDM.
 - Germany DNS belongs to
   `/home/janosch/DEV/infra/infra-configs/unifi/sites/germany/main.tf`, not this
   repo. Load the `unifi-network` skill before changing it.
@@ -116,8 +121,9 @@ is edited over plain HTTP on the radio itself, which serves a frameset
   index 0 empties it.
 
 `deploy/minipc-germany-01/sync-skytune-presets.sh <radio-ip> <serial>` mirrors
-the shared list onto such a radio; re-run it on the mini-PC after every
-favorites change, since the device holds its own copy and nothing syncs it
+the shared list onto such a radio; re-run it on the host serving the radio
+(the mini-PC, or CT 103 with `RADIO_API_BASE`/`RADIO_API_DATA` at YJ Janosch
+Home, see `deploy/yj-janosch-home/README.md`) after every favorites change, since the device holds its own copy and nothing syncs it
 back. The radio displays presets in stored order, so the script sorts them
 case-insensitively by name. Stations flagged `proxy` are pointed at
 `mediayou.php?action=stream`, which needs the radio's serial in
