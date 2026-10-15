@@ -68,6 +68,12 @@ time and firmware updates.
 | Auna Radio Gaga (`10022781`) | `00226126DD38` / `00:22:61:26:dd:38` | `10.3.103.224` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
 | Auna Radio Gaga (`10022781`) | `002261F9D326` / `00:22:61:f9:d3:26` | `10.3.103.214` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
 | Auna Worldwide Stereo (`10031867`) | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
+| model not yet read off the device (YJ Janosch Home) | `002261E53A24` (unverified) / `00:22:61:e5:3a:24` | `10.18.1.100` | legacy XML, `/setupapp/grandtradestar/` (hosts `grandtradestar{,2}.wifiradiofrontier.com`) |
+
+`10.3.x.x` addresses are the Germany LAN, `10.18.x.x` YJ Janosch Home. The
+YJ Janosch Home radio first registered there and was then registered on the
+Germany instance by replaying its own `loginXML.asp?mac=` request and merged
+into the shared profile through the GUI, so both instances know it.
 
 Two NE-6146T11 units and two Radio Gaga units are in service; the pair-mates
 are identical in protocol and differ only by identity. The two Radio Gagas sit
