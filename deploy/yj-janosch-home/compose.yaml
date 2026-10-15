@@ -1,0 +1,31 @@
+services:
+  radio-api:
+    build:
+      context: ../..
+      dockerfile: utils/Dockerfile
+      args:
+        ALPINE_MIRROR: ${ALPINE_MIRROR:-https://mirrors.aliyun.com/alpine}
+    image: jttdev/frontier-radio-api:local
+    restart: unless-stopped
+    ports:
+      - "10.18.0.13:80:80"
+      - "10.18.0.13:443:443"
+    volumes:
+      # table.json, radios_*.json and podcasts_*.json are pulled from
+      # minipc-germany-01 by frontier-radio-api-sync; the rest is local.
+      - ./data:/php-code/data
+      - ./media:/php-code/media
+      - ../minipc-germany-01/station-logos:/php-code/station-logos:ro
+    environment:
+      CONF_DOMAIN: http://10.18.0.13/
+      CONF_ALLOWED_DOMAIN: all
+      CONF_SHUFFLE_MUSIC: "true"
+      CONF_CACHE_EXPIRE: "1200"
+      CONF_USE_JSON_CACHE: "true"
+      CONF_STREAM_JSON: "false"
+      CONF_USE_LOGO_CACHE: "true"
+      CONF_FAVORITE_ITEMS: Radio,Radio-Browser
+      CONF_FORCE_LANGUAGE: ger
+      # Same serial -> profile map as Germany: the profiles come from the
+      # synced table.json, so an IR-130 moved between sites keeps its list.
+      CONF_MEDIAYOU_DEVICES: "ACA2132A1A7A=2,28A1EBFD12B8=2"

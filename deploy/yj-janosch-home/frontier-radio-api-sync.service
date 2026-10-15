@@ -1,0 +1,10 @@
+[Unit]
+Description=Pull Radio-API favorites and radio table from minipc-germany-01
+Documentation=https://github.com/jttdev/frontier-radio-api/blob/main/deploy/yj-janosch-home/README.md
+After=frontier-radio-api.service network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/sbin/frontier-radio-api-sync.sh
+TimeoutStartSec=5min
