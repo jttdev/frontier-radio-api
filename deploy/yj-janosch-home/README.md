@@ -1,7 +1,7 @@
 # YJ Janosch Home deployment
 
 Second Radio-API instance for the internet radios at YJ Janosch Home, in CT 103
-`utility-yj-janosch-home` (`10.18.0.13`) on `minipc-china-01`. It serves the
+`utility-yj-janosch-home` (`10.18.0.13`) on `minipc-china-02`. It serves the
 same favorites and radio registrations as the Germany instance, so a radio
 moved from Germany finds its list unchanged.
 
@@ -81,7 +81,7 @@ Station streams leave through the gw's full proxy.
 ## Deploy
 
 ```bash
-ssh -o BatchMode=yes minipc-china-01 'pct exec 103 -- sh -c "
+ssh -o BatchMode=yes minipc-china-02 'pct exec 103 -- sh -c "
   cd /opt/frontier-radio-api && git pull --ff-only &&
   mkdir -p deploy/yj-janosch-home/data deploy/yj-janosch-home/media &&
   docker compose -f deploy/yj-janosch-home/compose.yaml build radio-api &&
@@ -91,7 +91,7 @@ ssh -o BatchMode=yes minipc-china-01 'pct exec 103 -- sh -c "
 ## Verify
 
 ```bash
-ssh -o BatchMode=yes minipc-china-01 'pct exec 103 -- sh -c "
+ssh -o BatchMode=yes minipc-china-02 'pct exec 103 -- sh -c "
   systemctl is-active frontier-radio-api.service frontier-radio-api-health.timer frontier-radio-api-sync.timer
   curl -fsS http://10.18.0.13/setupapp/iden/asp/BrowseXML/loginXML.asp?token=0
   systemctl start frontier-radio-api-sync.service && journalctl -t frontier-radio-api-sync -n 3 --no-pager
