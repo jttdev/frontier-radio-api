@@ -58,6 +58,17 @@ after it first appears give it a fixed lease in
 ID, as in the Germany table in the repo `CLAUDE.md`). A Skytune unit then needs
 the preset push above.
 
+## Adding a new radio
+
+A radio that has never been in Germany registers on this instance under its own
+code, which the next sync from Germany overwrites. Give it a fixed lease as
+above. Then register it on the Germany instance by replaying its request
+against `10.3.0.12` (see "Known radios" in the repo `CLAUDE.md`), merge the new
+Germany code into the shared profile through the Germany GUI, and run
+`systemctl start frontier-radio-api-sync.service` in CT 103 to pull the
+merged identity here. Fetch `/index` as the radio to check: the menu must end
+in `GUI-Code: <SHARED_CODE>`.
+
 ## Network
 
 The radios join the `tdmt_main` SSID (Default VLAN). That VLAN's DNS is the

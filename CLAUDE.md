@@ -69,11 +69,17 @@ time and firmware updates.
 | Auna Radio Gaga (`10022781`) | `002261F9D326` / `00:22:61:f9:d3:26` | `10.3.103.214` | legacy XML, `/setupapp/auna/`, `fver=4`, `ven=una1` |
 | Auna Worldwide Stereo (`10031867`) | `00226156CA74` / `00:22:61:56:ca:74` | `10.3.103.10` | legacy XML, `/setupapp/auna/`, `fver=6`, `ven=una10` |
 | Auna, no model number on the device (YJ Janosch Home) | `002261E53A24` (unverified) / `00:22:61:e5:3a:24` | `10.18.1.100` (fixed lease) | legacy XML, `/setupapp/grandtradestar/` (hosts `grandtradestar{,2}.wifiradiofrontier.com`) |
+| Auna Harvard IR (YJ Janosch Home) | `4C09FA2A6D32` / `4c:09:fa:2a:6d:32` | `10.18.1.101` (fixed lease) | Airable JSON, firmware `ir-cui-FS2340-0000-0154_V4.5.14.294626-1A14`, DHCP hostname `Harvard` |
 
-`10.3.x.x` addresses are the Germany LAN, `10.18.x.x` YJ Janosch Home. The
-YJ Janosch Home radio first registered there and was then registered on the
-Germany instance by replaying its own `loginXML.asp?mac=` request and merged
-into the shared profile through the GUI, so both instances know it.
+`10.3.x.x` addresses are the Germany LAN, `10.18.x.x` YJ Janosch Home. A radio
+that starts out at YJ Janosch Home registers there first, under a local code
+that the next Germany sync wipes. It is therefore registered on the Germany
+instance as well, by replaying its own request against `10.3.0.12`, and then
+merged into the shared profile through the GUI, so both instances know it. For a
+legacy-XML radio the replay is its `loginXML.asp?mac=` request. For an Airable
+JSON radio it is any request with `Authorization: base64("<RID>:x")`: only the
+part before the colon is read (`Auth::getRadioID()`), and the RID is the
+12-hex Wi-Fi MAC, uppercased.
 
 Two NE-6146T11 units and two Radio Gaga units are in service; the pair-mates
 are identical in protocol and differ only by identity. The two Radio Gagas sit
