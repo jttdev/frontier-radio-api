@@ -20,6 +20,9 @@ radios on the Germany home LAN and at YJ Janosch Home (China).
 - Germany DNS belongs to
   `/home/janosch/DEV/infra/infra-configs/unifi/sites/germany/main.tf`, not this
   repo. Load the `unifi-network` skill before changing it.
+- CS-806 native Airable radios use the separate Python CONNECT adapter:
+  `deploy/cs806/README.md` (shared favorites under Popular stations, routing,
+  service installation, protocol tests). Do not register them as Frontier radios.
 
 ## Production topology
 
@@ -206,6 +209,8 @@ plain HTTP.
 | 1014 | hr1 | no | `http://dispatcher.rndfnk.com/hr/hr1/rheinmain/high` |
 | 1015 | 1LIVE | no | `http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3` |
 | 1016 | Radio Swiss Classic | no | `http://stream.srg-ssr.ch/srgssr/rsc_de/aac/192` |
+| 1017 | TOGGO Radio | no | `http://radio.toggo.de/live/mp3-192` |
+| 1018 | Radio TEDDY | no | `http://streamtdy.ir-media-tec.com/live/mp3-128/web/play.mp3` |
 
 Station IDs are list indices plus 1000 and can change if the stored list is
 reordered.

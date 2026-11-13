@@ -1,0 +1,23 @@
+[Unit]
+Description=CS-806 shared radio favorites adapter
+After=network-online.target frontier-radio-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=/opt/frontier-radio-api
+LoadCredential=tls.crt:/opt/frontier-radio-api/deploy/yj-janosch-home/data/ssl_crt.pem
+LoadCredential=tls.key:/opt/frontier-radio-api/deploy/yj-janosch-home/data/ssl_key.pem
+ExecStart=/usr/bin/python3 deploy/cs806/adapter.py --data /opt/frontier-radio-api/deploy/yj-janosch-home/data/radios_2.json --cert %d/tls.crt --key %d/tls.key
+Restart=on-failure
+RestartSec=5
+DynamicUser=yes
+NoNewPrivileges=yes
+ProtectSystem=strict
+ProtectHome=yes
+PrivateTmp=yes
+MemoryMax=128M
+TasksMax=64
+
+[Install]
+WantedBy=multi-user.target
