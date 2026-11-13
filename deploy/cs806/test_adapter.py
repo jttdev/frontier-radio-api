@@ -110,6 +110,11 @@ class AdapterTests(unittest.TestCase):
 
     def test_preserves_signed_upstream_requests(self):
         server = self.start_server(adapter.RadioHandler)
+        with tempfile.TemporaryDirectory() as capture:
+            self.check_signed_request(server, Path(capture))
+
+    def check_signed_request(self, server, capture):
+        server.capture_dir = capture
         with patch.object(adapter.http.client, "HTTPSConnection") as upstream:
             response = upstream.return_value.getresponse.return_value
             response.status = 200
@@ -123,6 +128,9 @@ class AdapterTests(unittest.TestCase):
             args, kwargs = upstream.return_value.request.call_args
             self.assertEqual(args, ("GET", "/airable/radios/search?q=hello%20world"))
             self.assertEqual(kwargs["headers"]["Authorization"], "Basic test-only")
+            captured = json.loads(next(capture.glob("*.json")).read_text())
+            self.assertEqual(captured["body"], {"upstream": True})
+            self.assertNotIn("Authorization", json.dumps(captured))
             conn.close()
 
     def test_nometa_stream_does_not_forward_credentials(self):

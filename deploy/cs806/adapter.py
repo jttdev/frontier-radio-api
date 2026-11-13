@@ -199,14 +199,17 @@ class RadioHandler(QuietHandler):
             if len(data) > 4 * 1024 * 1024:
                 raise ValueError("directory response too large")
             if getattr(self.server, "capture_dir", None):
-                decoded = gzip.decompress(data) if res.getheader("Content-Encoding") == "gzip" else data
-                # Diagnostic only: never capture Authorization or other request
-                # headers. Responses may carry signed URLs; keep them in /run.
-                record = {"path": self.path.split("?")[0], "status": res.status,
-                          "body": json.loads(decoded)}
-                dest = self.server.capture_dir / f"{time.time_ns()}.json"
-                with dest.open("x", opener=lambda p, f: os.open(p, f, 0o600)) as out:
-                    json.dump(record, out)
+                try:
+                    decoded = gzip.decompress(data) if res.getheader("Content-Encoding") == "gzip" else data
+                    # Diagnostic only: never capture Authorization or other request
+                    # headers. Responses may carry signed URLs; keep them in /run.
+                    record = {"path": self.path.split("?")[0], "status": res.status,
+                              "body": json.loads(decoded)}
+                    dest = self.server.capture_dir / f"{time.time_ns()}.json"
+                    with open(dest, "x", opener=lambda p, f: os.open(p, f, 0o600)) as out:
+                        json.dump(record, out)
+                except (OSError, ValueError) as exc:
+                    LOG.warning("diagnostic capture skipped: %s", type(exc).__name__)
             self.send_body(res.status, data, res.getheader("Content-Type", "application/json"), res.getheaders())
             LOG.info("upstream %s: %s", self.command, res.status)
         finally:
