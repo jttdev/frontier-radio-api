@@ -8,15 +8,18 @@ own upstream traffic must bypass this proxy in Mihomo to avoid a routing loop.
 
 import argparse
 import hashlib
+import gzip
 import http.client
 import http.server
 import json
 import logging
 import math
+import os
 from pathlib import Path
 import re
 import ssl
 import threading
+import time
 import urllib.parse
 import urllib.request
 
@@ -195,6 +198,15 @@ class RadioHandler(QuietHandler):
             data = res.read(4 * 1024 * 1024 + 1)
             if len(data) > 4 * 1024 * 1024:
                 raise ValueError("directory response too large")
+            if getattr(self.server, "capture_dir", None):
+                decoded = gzip.decompress(data) if res.getheader("Content-Encoding") == "gzip" else data
+                # Diagnostic only: never capture Authorization or other request
+                # headers. Responses may carry signed URLs; keep them in /run.
+                record = {"path": self.path.split("?")[0], "status": res.status,
+                          "body": json.loads(decoded)}
+                dest = self.server.capture_dir / f"{time.time_ns()}.json"
+                with dest.open("x", opener=lambda p, f: os.open(p, f, 0o600)) as out:
+                    json.dump(record, out)
             self.send_body(res.status, data, res.getheader("Content-Type", "application/json"), res.getheaders())
             LOG.info("upstream %s: %s", self.command, res.status)
         finally:
@@ -278,12 +290,21 @@ def main():
     parser.add_argument("--key", required=True)
     parser.add_argument("--allow-client", action="append", default=["127.0.0.1", "10.18.0.2", "10.18.0.13"])
     parser.add_argument("--direct-tls-port", type=int, help="optional temporary DNAT test listener")
+    parser.add_argument("--capture-dir", help="temporary upstream JSON diagnostics under /run")
     args = parser.parse_args()
     logging.basicConfig(level=logging.INFO, format="%(message)s")
     context = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
     context.load_cert_chain(args.cert, args.key)
     options = dict(upstream=args.upstream, data=args.data, context=context, clients=args.allow_client)
     server = Server((args.bind, args.port), ConnectHandler, **options)
+    if args.capture_dir:
+        capture = Path(args.capture_dir).resolve()
+        if not capture.is_relative_to(Path("/run")):
+            parser.error("capture directory must be under /run")
+        capture.mkdir(mode=0o700, parents=True, exist_ok=True)
+        if capture.stat().st_mode & 0o077:
+            parser.error("capture directory must have mode 0700")
+        server.capture_dir = capture
     if args.direct_tls_port:
         direct = Server((args.bind, args.direct_tls_port), RadioHandler, **options)
         direct.socket = context.wrap_socket(direct.socket, server_side=True)
