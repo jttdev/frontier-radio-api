@@ -44,13 +44,13 @@ class Favorites:
             if parts.scheme not in ("http", "https") or not parts.hostname or parts.username:
                 raise ValueError("invalid configured stream URL")
             # Stable across list reordering and renaming, unlike index-based IDs.
-            key = hashlib.sha256(url.encode()).hexdigest()[:24]
+            key = "99" + str(int(hashlib.sha256(url.encode()).hexdigest()[:14], 16) % 10**14).zfill(14)
             result[key] = row
         return result
 
     def station(self, key, row, full=False):
         station = {
-            "id": ["airable", "radio"], "title": row["name"],
+            "id": ["airable", "radio", key], "title": row["name"],
             "url": self.base + LOCAL + "station/" + key,
             "description": row.get("desc", ""),
         }
@@ -62,9 +62,9 @@ class Favorites:
                 row["url"].lower().endswith(".aac") or
                 row["url"] == "http://yyt.asiafm.net:8000/asiafm" else "MP3")
             station["streams"] = [{
-                "id": ["airable", "radio.stream"], "title": codec,
+                "id": ["airable", "radio.stream", key], "title": codec,
                 "url": self.base + LOCAL + "play/" + key,
-                "codec": {"name": codec}, "icy": not bool(row.get("nometa")),
+                "codec": {"name": codec, "bitrate": row.get("bitrate", 128)}, "icy": not bool(row.get("nometa")),
             }]
         return station
 
@@ -79,7 +79,7 @@ class Favorites:
         pages = max(1, math.ceil(len(rows) / limit))
         url = self.base + POPULAR
         return {
-            "id": ["airable.radios", "listing"], "title": "Our favorites", "url": url,
+            "id": ["airable.radios", "listing", "popular"], "title": "Our favorites", "url": url,
             "content": {
                 "entries": [self.station(k, r) for k, r in rows[offset:offset + limit]],
                 "pagination": {
@@ -140,7 +140,7 @@ class RadioHandler(QuietHandler):
                 self.send_json(answer)
                 return
             if path.path.startswith(LOCAL):
-                match = re.fullmatch(re.escape(LOCAL) + r"(station|play|stream)/([a-f0-9]{24})", path.path)
+                match = re.fullmatch(re.escape(LOCAL) + r"(station|play|stream)/(99[0-9]{14})", path.path)
                 if self.command != "GET" or not match:
                     self.send_error(404)
                     return
@@ -158,7 +158,7 @@ class RadioHandler(QuietHandler):
                 else:
                     url = (favorites.base + LOCAL + "stream/" + key
                            if row.get("proxy") or row.get("nometa") else row["url"])
-                    self.send_json({"id": ["airable", "redirect"], "url": url, "content": station})
+                    self.send_json({"id": ["airable", "redirect", key], "url": url, "content": station})
                     LOG.info("play: %s", row["name"])
                 return
             self.forward()

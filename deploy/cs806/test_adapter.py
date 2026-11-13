@@ -40,7 +40,12 @@ class AdapterTests(unittest.TestCase):
 
     def test_protocol_filter_sort_and_pagination(self):
         first = self.favorites.directory("limit=1")
-        self.assertEqual(first["id"], ["airable.radios", "listing"])
+        self.assertEqual(first["id"], ["airable.radios", "listing", "popular"])
+        # Captured CS-806 responses have three-part IDs. Two-part IDs make
+        # app 0.43.3.ru leave Internet Radio for its main menu.
+        for entry in first["content"]["entries"]:
+            self.assertEqual(entry["id"][:2], ["airable", "radio"])
+            self.assertRegex(entry["id"][2], r"^\d{16}$")
         self.assertEqual(first["content"]["entries"][0]["title"], "Alpha")
         self.assertEqual(first["content"]["collection"], {"size": 2, "limit": 1, "offset": 0})
         self.assertEqual(first["content"]["pagination"]["pages"]["values"], [1, 2])
@@ -86,7 +91,8 @@ class AdapterTests(unittest.TestCase):
         _, detail = self.tunnel(server, path)
         self.assertEqual(detail["streams"][0]["codec"]["name"], "AAC")
         _, play = self.tunnel(server, detail["streams"][0]["url"].removeprefix("https://radio.test"))
-        self.assertEqual(play["id"], ["airable", "redirect"])
+        self.assertEqual(play["id"], ["airable", "redirect", entry["id"][2]])
+        self.assertEqual(len(detail["streams"][0]["id"]), 3)
         self.assertIn("/local/cs806/stream/", play["url"])
         self.rows = []
         self.save()
