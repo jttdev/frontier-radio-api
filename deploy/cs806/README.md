@@ -5,6 +5,10 @@ use `5788230443.airable.io`, HTTP Basic-shaped per-request signatures, and the
 `cachip 1.0` user agent. They accept this deployment's self-signed TLS certificate.
 They speak native Airable JSON, distinct from the Frontier JSON adapter in PHP.
 
+The two configured YJ Home units were observed at `10.18.1.181` (Wi-Fi MAC
+`f8:70:41:0e:3a:65`) and `10.18.1.166`. These are DHCP observations, not routing
+selectors; the exact directory hostname identifies compatible units.
+
 The `cs806-radio` service runs in YJ Home CT 103 and accepts HTTP CONNECT from
 the Mihomo gateway on `10.18.0.13:8088`. It terminates the radio's TLS inside
 the tunnel, answers `/airable/radios/popular` from `data/radios_2.json`, and
@@ -94,6 +98,11 @@ new connections return to Airable. Then `systemctl disable --now cs806-radio`.
 The Auna/Frontier HTTP/HTTPS endpoints are separate and remain available.
 
 ## Protocol diagnosis
+
+Radio, stream and redirect identifiers must have three parts, matching native
+Airable responses. Two-part IDs make app `0.43.3.ru` exit Internet Radio to the
+main menu. Station location, language and slogan must be present even when
+empty, because omitted fields can leave the previous station's text displayed.
 
 `deploy/airable-probe.py` is a temporary transparent HTTP forwarding probe.
 Its captures include credentials and must stay in a mode-0700 `/run` directory.
