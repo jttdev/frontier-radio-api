@@ -1,0 +1,8 @@
+{
+  "http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3": {
+    "source": "https://5788230443.airable.io/id/airable/radio/9123828899115325",
+    "slogan": "Für den Sektor",
+    "place": {"id": "4356916689313948", "title": "Cologne"},
+    "language": {"id": "5287211298011244", "title": "German"}
+  }
+}

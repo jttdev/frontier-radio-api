@@ -62,6 +62,17 @@ class AdapterTests(unittest.TestCase):
         self.save()
         self.assertEqual(self.favorites.directory("")["content"]["entries"], [])
 
+    def test_verified_station_details_and_full_artwork_range(self):
+        row = {"name": "1LIVE", "url": "http://wdr-1live-live.icecast.wdr.de/wdr/1live/live/mp3/128/stream.mp3",
+               "logo": "http://radio.test/station-logos/1live.png"}
+        station = self.favorites.station("9912345678901234", row, full=True)
+        self.assertEqual(station["place"]["title"], "Cologne")
+        self.assertEqual(station["language"]["title"], "German")
+        self.assertEqual(station["slogan"], "Für den Sektor")
+        self.assertEqual([image["width"] for image in station["images"]], [64, 128, 256, 512, 1024])
+        row["logo"] = "http://radio.test/station-logos/not-vendored.png"
+        self.assertEqual(self.favorites.station("9912345678901234", row)["images"][0]["url"], row["logo"])
+
     def start_server(self, handler=adapter.ConnectHandler):
         ctx = ssl.SSLContext(ssl.PROTOCOL_TLS_SERVER)
         ctx.load_cert_chain(self.cert, self.key)
@@ -102,7 +113,16 @@ class AdapterTests(unittest.TestCase):
         self.assertIn("/local/cs806/stream/", play["url"])
         self.rows = []
         self.save()
-        self.assertEqual(self.tunnel(server, path)[0], 404)
+        self.assertEqual(self.tunnel(server, adapter.LOCAL + "station/" + entry["id"][2])[0], 404)
+
+    def test_unrelated_native_station_with_same_prefix_is_forwarded(self):
+        server = self.start_server(adapter.RadioHandler)
+        with patch.object(adapter.RadioHandler, "forward", autospec=True) as forward:
+            forward.side_effect = lambda handler: handler.send_json({"native": True})
+            conn = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+            conn.request("GET", "/id/airable/radio/9912345678901234")
+            self.assertEqual(json.loads(conn.getresponse().read()), {"native": True})
+            conn.close()
 
     def test_connect_rejects_other_destinations(self):
         server = self.start_server()

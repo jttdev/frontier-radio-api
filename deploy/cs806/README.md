@@ -24,7 +24,8 @@ It never logs credentials or forwards them to station stream servers.
   YJ list; this service reads it on each request, without a cache or restart.
 - Local detail/play URLs use a hash of the configured stream URL, so presets
   survive reordering and renaming. Changing a stream URL changes its ID;
-  re-save that preset. Removed entries return 404, never a different station.
+  re-save that preset. Unknown native IDs pass through to Airable; removed
+  legacy `/local/cs806/` entries return 404.
 - Search, locations, and other upstream browsing continue through Airable.
   Local entries omit upstream `actions`: use PRESET to save them on the radio,
   not the upstream cloud-favorites action.
@@ -33,6 +34,24 @@ It never logs credentials or forwards them to station stream servers.
   URL directly. The relay follows HTTP redirects and supports HTTPS streams.
 - Codec defaults to MP3, with AAC detection for `/aac/`, `.aac`, and AsiaFM's
   extensionless stream. An optional `codec` station field overrides it.
+
+## Station information and artwork
+
+`station-details.json` supplements the shared list by exact stream URL with
+verified static Airable fields. 1LIVE has the native place `Cologne`, language
+`German`, and slogan `Für den Sektor`. Other stations explicitly clear these
+fields to prevent the firmware retaining information from the previous station.
+Add verified entries with a source URL; do not infer locations from stream hosts.
+
+These fields are station information, not changing artist/song titles. Observed
+CS-806 stream requests send `Icy-MetaData: 0`, including native Airable playback;
+dynamic track information is not confirmed on this firmware.
+
+Vendored logos have the native Airable size range: 64, 128, 256, 512, and 1024
+pixels. Regenerate with `sh deploy/cs806/generate-logos.sh` (ImageMagick required)
+and commit the results. The nginx station-logos bind mount serves them directly.
+Upscaling supplies the firmware's requested sizes but does not add image detail.
+If any generated variant is absent, the adapter advertises the original logo.
 
 ## Routing
 

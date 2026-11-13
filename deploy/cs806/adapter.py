@@ -28,6 +28,7 @@ POPULAR = "/airable/radios/popular"
 LOCAL = "/local/cs806/"
 DETAIL = "/id/airable/radio/"
 PLAY = "/airable/play/radio/"
+IMAGE_SIZES = (64, 128, 256, 512, 1024)
 HOP_HEADERS = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
                "te", "trailer", "transfer-encoding", "upgrade", "content-length"}
 
@@ -54,23 +55,30 @@ class Favorites:
         return result
 
     def station(self, key, row, full=False):
+        details = json.loads(Path(__file__).with_name("station-details.json").read_text()).get(row["url"], {})
         station = {
             "id": ["airable", "radio", key], "title": row["name"],
             "url": self.base + DETAIL + key,
-            "description": row.get("desc", ""),
-            "slogan": "",
+            "description": row.get("desc") or details.get("description", ""),
+            "slogan": details.get("slogan", ""),
             "images": [],
             # The CS-806 retains prior station fields when they are omitted.
-            # Our shared list has no verified geographic/language metadata.
             "place": {"id": ["airable", "place", "0"], "title": "", "url": self.base + POPULAR},
             "language": {"id": ["airable", "language", "0"], "title": "", "url": self.base + POPULAR},
         }
+        for field in ("place", "language"):
+            if field in details:
+                station[field] = {"id": ["airable", field, details[field]["id"]],
+                                  "title": details[field]["title"],
+                                  "url": self.base + "/id/airable/" + field + "/" + details[field]["id"]}
         if row.get("logo", "").startswith(("http://", "https://")):
             station["images"] = [{"url": row["logo"], "width": 150, "height": 150}]
             if "/station-logos/" in row["logo"] and row["logo"].endswith(".png"):
                 prefix, filename = row["logo"].rsplit("/", 1)
-                station["images"] = [{"url": f"{prefix}/cs806/{size}/{filename}",
-                                      "width": size, "height": size} for size in (64, 128)]
+                assets = Path(__file__).resolve().parent.parent / "minipc-germany-01/station-logos/cs806"
+                if all((assets / str(size) / filename).is_file() for size in IMAGE_SIZES):
+                    station["images"] = [{"url": f"{prefix}/cs806/{size}/{filename}",
+                                          "width": size, "height": size} for size in IMAGE_SIZES]
         if full:
             # AsiaFM's extensionless endpoint supplies AAC; SRG includes /aac/.
             codec = row.get("codec") or ("AAC" if "/aac/" in row["url"] or
@@ -157,6 +165,12 @@ class RadioHandler(QuietHandler):
                 return
             detail = re.fullmatch(re.escape(DETAIL) + r"(99[0-9]{14})", path.path)
             play = re.fullmatch(re.escape(PLAY) + r"(99[0-9]{14})/(98[0-9]{14})", path.path)
+            # Real Airable IDs can share our numeric prefix. Only claim IDs
+            # derived from the current shared list; forward unrelated stations.
+            native_id = detail[1] if detail else play[1] if play else None
+            if native_id and native_id not in favorites.stations():
+                self.forward()
+                return
             if path.path.startswith(LOCAL) or detail or play:
                 match = re.fullmatch(re.escape(LOCAL) + r"(station|play|stream)/(99[0-9]{14})", path.path)
                 if detail:
