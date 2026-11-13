@@ -38,6 +38,15 @@ Centre-crop non-square sources to a square before resizing. Padding them to
 150x150 instead leaves visible bars on the radio display, which is obvious on
 artwork with a dark background.
 
+TOGGO Radio (`toggo-radio.png`) and Radio TEDDY (`radio-teddy.png`) use the
+broadcasters' vector logos hosted on Wikimedia Commons:
+[TOGGO Radio](https://commons.wikimedia.org/wiki/File:Toggo_Radio_Logo_2020.svg)
+and [Radio TEDDY](https://commons.wikimedia.org/wiki/File:Radio_Teddy_Logo.svg).
+Both source pages identify the logos as public-domain text/shape artwork;
+trademarks belong to the broadcasters. These standalone logos are fitted without
+cropping onto a white square. Each has a 150px main image and CS-806 variants
+under `cs806/{64,128,256,512,1024}/`, rendered from the vectors.
+
 They must be vendored rather than linked: `assets.wifiradiofrontier.com` is a
 CNAME to `airable.wifiradiofrontier.com`, which the Germany UDM overrides to
 `10.3.0.12`. Every host on this LAN — including the Radio-API container that
