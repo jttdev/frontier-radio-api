@@ -89,6 +89,9 @@ class AdapterTests(unittest.TestCase):
         entry = listing["content"]["entries"][0]
         path = entry["url"].removeprefix("https://radio.test")
         _, detail = self.tunnel(server, path)
+        self.assertEqual(detail["place"]["title"], "")
+        self.assertEqual(detail["language"]["title"], "")
+        self.assertEqual(detail["slogan"], "")
         self.assertEqual(detail["streams"][0]["codec"]["name"], "AAC")
         _, play = self.tunnel(server, detail["streams"][0]["url"].removeprefix("https://radio.test"))
         self.assertEqual(play["id"], ["airable", "redirect", entry["id"][2]])

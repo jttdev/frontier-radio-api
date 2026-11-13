@@ -53,6 +53,12 @@ class Favorites:
             "id": ["airable", "radio", key], "title": row["name"],
             "url": self.base + LOCAL + "station/" + key,
             "description": row.get("desc", ""),
+            "slogan": "",
+            "images": [],
+            # The CS-806 retains prior station fields when they are omitted.
+            # Our shared list has no verified geographic/language metadata.
+            "place": {"id": ["airable", "place", "0"], "title": "", "url": self.base + POPULAR},
+            "language": {"id": ["airable", "language", "0"], "title": "", "url": self.base + POPULAR},
         }
         if row.get("logo", "").startswith(("http://", "https://")):
             station["images"] = [{"url": row["logo"], "width": 150, "height": 150}]
