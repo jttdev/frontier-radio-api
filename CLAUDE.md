@@ -20,6 +20,9 @@ radios on the Germany home LAN and at YJ Janosch Home (China).
 - Germany DNS belongs to
   `/home/janosch/DEV/infra/infra-configs/unifi/sites/germany/main.tf`, not this
   repo. Load the `unifi-network` skill before changing it.
+- CS-806 native Airable radios use the separate Python CONNECT adapter:
+  `deploy/cs806/README.md` (shared favorites under Popular stations, routing,
+  service installation, protocol tests). Do not register them as Frontier radios.
 
 ## Production topology
 
