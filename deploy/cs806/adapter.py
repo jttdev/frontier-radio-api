@@ -26,6 +26,8 @@ import urllib.request
 LOG = logging.getLogger("cs806")
 POPULAR = "/airable/radios/popular"
 LOCAL = "/local/cs806/"
+DETAIL = "/id/airable/radio/"
+PLAY = "/airable/play/radio/"
 HOP_HEADERS = {"connection", "keep-alive", "proxy-authenticate", "proxy-authorization",
                "te", "trailer", "transfer-encoding", "upgrade", "content-length"}
 
@@ -54,7 +56,7 @@ class Favorites:
     def station(self, key, row, full=False):
         station = {
             "id": ["airable", "radio", key], "title": row["name"],
-            "url": self.base + LOCAL + "station/" + key,
+            "url": self.base + DETAIL + key,
             "description": row.get("desc", ""),
             "slogan": "",
             "images": [],
@@ -65,14 +67,19 @@ class Favorites:
         }
         if row.get("logo", "").startswith(("http://", "https://")):
             station["images"] = [{"url": row["logo"], "width": 150, "height": 150}]
+            if "/station-logos/" in row["logo"] and row["logo"].endswith(".png"):
+                prefix, filename = row["logo"].rsplit("/", 1)
+                station["images"] = [{"url": f"{prefix}/cs806/{size}/{filename}",
+                                      "width": size, "height": size} for size in (64, 128)]
         if full:
             # AsiaFM's extensionless endpoint supplies AAC; SRG includes /aac/.
             codec = row.get("codec") or ("AAC" if "/aac/" in row["url"] or
                 row["url"].lower().endswith(".aac") or
                 row["url"] == "http://yyt.asiafm.net:8000/asiafm" else "MP3")
             station["streams"] = [{
-                "id": ["airable", "radio.stream", key], "title": codec,
-                "url": self.base + LOCAL + "play/" + key,
+                "id": ["airable", "radio.stream", "98" + key[2:]],
+                "title": f"{codec.lower()}, {row.get('bitrate', 128)} kb/s",
+                "url": self.base + PLAY + key + "/98" + key[2:],
                 "codec": {"name": codec, "bitrate": row.get("bitrate", 128)}, "icy": not bool(row.get("nometa")),
             }]
         return station
@@ -148,12 +155,22 @@ class RadioHandler(QuietHandler):
                 LOG.info("favorites: %s entries", len(answer["content"]["entries"]))
                 self.send_json(answer)
                 return
-            if path.path.startswith(LOCAL):
+            detail = re.fullmatch(re.escape(DETAIL) + r"(99[0-9]{14})", path.path)
+            play = re.fullmatch(re.escape(PLAY) + r"(99[0-9]{14})/(98[0-9]{14})", path.path)
+            if path.path.startswith(LOCAL) or detail or play:
                 match = re.fullmatch(re.escape(LOCAL) + r"(station|play|stream)/(99[0-9]{14})", path.path)
-                if self.command != "GET" or not match:
+                if detail:
+                    action, key = "station", detail[1]
+                elif play and play[2] == "98" + play[1][2:]:
+                    action, key = "play", play[1]
+                elif match:
+                    action, key = match.groups()
+                else:
                     self.send_error(404)
                     return
-                action, key = match.groups()
+                if self.command != "GET":
+                    self.send_error(404)
+                    return
                 row = favorites.stations().get(key)
                 if row is None:
                     self.send_json({"id": ["airable", "error"], "message": "Station removed"}, 404)
@@ -167,7 +184,8 @@ class RadioHandler(QuietHandler):
                 else:
                     url = (favorites.base + LOCAL + "stream/" + key
                            if row.get("proxy") or row.get("nometa") else row["url"])
-                    self.send_json({"id": ["airable", "redirect", key], "url": url, "content": station})
+                    redirect_id = hashlib.sha256(url.encode()).hexdigest()[:32]
+                    self.send_json({"id": ["airable", "redirect", redirect_id], "url": url, "content": station})
                     LOG.info("play: %s", row["name"])
                 return
             self.forward()

@@ -94,8 +94,11 @@ class AdapterTests(unittest.TestCase):
         self.assertEqual(detail["slogan"], "")
         self.assertEqual(detail["streams"][0]["codec"]["name"], "AAC")
         _, play = self.tunnel(server, detail["streams"][0]["url"].removeprefix("https://radio.test"))
-        self.assertEqual(play["id"], ["airable", "redirect", entry["id"][2]])
+        self.assertEqual(play["id"][:2], ["airable", "redirect"])
+        self.assertRegex(play["id"][2], r"^[0-9a-f]{32}$")
         self.assertEqual(len(detail["streams"][0]["id"]), 3)
+        self.assertNotEqual(detail["streams"][0]["id"][2], entry["id"][2])
+        self.assertIn("/airable/play/radio/", detail["streams"][0]["url"])
         self.assertIn("/local/cs806/stream/", play["url"])
         self.rows = []
         self.save()
