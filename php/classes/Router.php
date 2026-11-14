@@ -203,19 +203,32 @@ class Router {
 
 		$pd = PodcastLoader::getPodcastDataById( $id, $this->data );
 
-		foreach( $pd['episodes'] as $eid => $e ){
+		// Keep feed order stable after playback. Paging keeps every episode
+		// reachable without exceeding the firmware's response-size limit.
+		$pageSize = 100;
+		$page = isset($_GET['page']) && ctype_digit(strval($_GET['page'])) ? intval($_GET['page']) : 0;
+		$lastPage = max(0, (int)ceil(count($pd['episodes']) / $pageSize) - 1);
+		$page = min($page, $lastPage);
+		$baseUrl = Config::RADIO_DOMAIN . 'list?tid=3&id=' . $id;
+		if($page > 0){
+			$this->out->prevUrl($baseUrl . '&page=' . ($page - 1));
+		}
+		foreach( array_slice($pd['episodes'], $page * $pageSize, $pageSize, true) as $eid => $e ){
 			$this->out->addEpisode(
 				$id, $eid,
 				$pd['title'],
 				$this->unread->knownItemMark($id, $e['url']) . $e['title'],
 				$this->data->getPodcastURL($id, $eid, $this->radioId->getMac(), sloppy: true),
 				$e['desc'], $pd['logo'],
-				!$this->unread->knownItem($id, $e['url']),
+				false,
 				OutputPlayStatus::Info
 			);
 		}
 
-		$this->out->currentUrl(Config::RADIO_DOMAIN . 'list?tid=3&id=' . $id, $pd['title']);
+		if($page < $lastPage){
+			$this->out->addDir('Next Page', $baseUrl . '&page=' . ($page + 1), true);
+		}
+		$this->out->currentUrl($baseUrl . ($page > 0 ? '&page=' . $page : ''), $pd['title']);
 	}
 		
 	private function listDirectory(?int $tid = null, ?string $cat = null) : void {

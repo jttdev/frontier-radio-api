@@ -23,6 +23,9 @@ radios on the Germany home LAN and at YJ Janosch Home (China).
 - CS-806 native Airable radios use the separate Python CONNECT adapter:
   `deploy/cs806/README.md` (shared favorites under Popular stations, routing,
   service installation, protocol tests). Do not register them as Frontier radios.
+- Frontier podcast episode lists preserve feed order after playback, with 100
+  episodes per page and a `Next Page` link. `*` marks unplayed episodes; played
+  episodes stay in place. Keep responses below the firmware's 200-item limit.
 
 ## Production topology
 
