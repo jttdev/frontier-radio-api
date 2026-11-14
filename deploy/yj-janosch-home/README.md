@@ -78,15 +78,34 @@ endpoints to `10.18.0.13`: the same seven names the Germany UDM overrides (see
 `../minipc-germany-01/README.md`). Time and firmware-update hosts stay public.
 Station streams leave through the gw's full proxy.
 
+## Podcast archives
+
+The shared profile uses the nine local children's podcast feeds at
+`http://10.18.0.12:8080/feeds/<slug>.xml`, served by the archive CT 102 on
+the same mini-PC. Feed generation, artwork and the show allowlist belong to
+[`radio-archive/podcast-archives/serving`](../../../radio-archive/podcast-archives/serving/README.md).
+Subscriptions are maintained through the Germany GUI and synced here.
+Set `proxy=no` for these feeds: their audio URLs are on the local LAN, and the
+Frontier stream proxy rejects private IPs. The public station favorites remain
+independent of the podcast subscriptions.
+
+Episode lists keep feed order after playback, with `*` marking unplayed
+episodes. Each page contains up to 100 episodes and a `Nächste Seite` entry;
+the radio's Back button returns to the previous page. Show artwork is cached
+by Radio-API from the local archive feeds' image URLs.
+
 ## Deploy
 
 ```bash
 ssh -o BatchMode=yes minipc-china-02 'pct exec 103 -- sh -c "
   cd /opt/frontier-radio-api && git pull --ff-only &&
   mkdir -p deploy/yj-janosch-home/data deploy/yj-janosch-home/media &&
-  docker compose -f deploy/yj-janosch-home/compose.yaml build radio-api &&
+  docker build --network host --build-arg ALPINE_MIRROR=https://mirrors.aliyun.com/alpine -t jttdev/frontier-radio-api:local -f utils/Dockerfile . &&
   deploy/yj-janosch-home/install-service.sh"'
 ```
+
+Host networking gives the image build the CT's gateway/DNS path for PECL
+downloads. Container bridge networking can fail TLS downloads from pecl.php.net.
 
 ## Verify
 

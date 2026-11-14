@@ -51,6 +51,17 @@ These fields are station information, not changing artist/song titles. Observed
 CS-806 stream requests send `Icy-MetaData: 0`, including native Airable playback;
 dynamic track information is not confirmed on this firmware.
 
+Supplying ICY metadata through a relay is insufficient to make live text appear
+on the tested YJ Home CS-806. In the Die Maus test (2026-11-14), the radio reached
+the forced-metadata relay with `Icy-MetaData: 0`; the relay negotiated an upstream
+`icy-metaint` of 16384, and a separate relay client verified a live `StreamTitle`
+block. The operator reported no metadata on the radio's display. Audio quality
+was not confirmed. The temporary override is disabled and ordinary playback is
+restored. A firmware limitation is suspected; alternate display modes and a
+separate Airable metadata mechanism remain unverified. This result does not
+establish that every metadata mechanism is unsupported, or that both units were
+tested individually.
+
 For a controlled firmware test, set `CS806_FORCE_ICY_URL` in the service environment
 to one exact configured stream URL and restart `cs806-radio`. That station's next
 play request uses the relay, which requests and forwards ICY metadata even when
