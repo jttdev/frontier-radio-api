@@ -37,6 +37,10 @@ class Favorites:
     def __init__(self, path, host):
         self.path = Path(path)
         self.base = "https://" + host
+        self.force_icy_url = os.environ.get("CS806_FORCE_ICY_URL", "")
+
+    def force_icy(self, row):
+        return bool(self.force_icy_url and row["url"] == self.force_icy_url and not row.get("nometa"))
 
     def stations(self):
         # Read on each request: Germany's five-minute sync owns this file.
@@ -197,7 +201,7 @@ class RadioHandler(QuietHandler):
                     self.send_json(station)
                 else:
                     url = (favorites.base + LOCAL + "stream/" + key
-                           if row.get("proxy") or row.get("nometa") else row["url"])
+                           if row.get("proxy") or row.get("nometa") or favorites.force_icy(row) else row["url"])
                     redirect_id = hashlib.sha256(url.encode()).hexdigest()[:32]
                     self.send_json({"id": ["airable", "redirect", redirect_id], "url": url, "content": station})
                     LOG.info("play: %s", row["name"])
@@ -251,10 +255,14 @@ class RadioHandler(QuietHandler):
         # Only admin-configured stream URLs are fetched; never accept a URL parameter
         # or forward the radio's Airable credentials to a broadcaster.
         headers = {"User-Agent": self.headers.get("User-Agent", "cachip 1.0"), "Accept-Encoding": "identity"}
-        if not row.get("nometa") and self.headers.get("Icy-MetaData") == "1":
+        forced = self.server.favorites.force_icy(row)
+        if not row.get("nometa") and (forced or self.headers.get("Icy-MetaData") == "1"):
             headers["Icy-MetaData"] = "1"
         request = urllib.request.Request(row["url"], headers=headers)
         with urllib.request.urlopen(request, timeout=20) as res:
+            LOG.info("stream: %s requested-icy=%s forced=%s upstream-metaint=%s",
+                     row["name"], self.headers.get("Icy-MetaData", "absent"),
+                     forced, res.headers.get("icy-metaint", "absent"))
             self.send_response(res.status)
             self.send_header("Content-Type", res.headers.get("Content-Type", "audio/mpeg"))
             for name in ("icy-name", "icy-br", "icy-genre", "icy-metaint"):

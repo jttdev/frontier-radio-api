@@ -51,6 +51,16 @@ These fields are station information, not changing artist/song titles. Observed
 CS-806 stream requests send `Icy-MetaData: 0`, including native Airable playback;
 dynamic track information is not confirmed on this firmware.
 
+For a controlled firmware test, set `CS806_FORCE_ICY_URL` in the service environment
+to one exact configured stream URL and restart `cs806-radio`. That station's next
+play request uses the relay, which requests and forwards ICY metadata even when
+the client declines it. Other stations keep their usual behavior; `nometa` takes
+precedence. Logs report the client's negotiation and upstream `icy-metaint`,
+without credentials. The radio must be retuned to request a fresh play URL.
+Remove the environment override and restart to restore ordinary negotiation;
+retune any radio still connected to the test stream. This tests decoder support,
+and can cause playback failure on firmware that cannot parse ICY blocks.
+
 Vendored logos have the native Airable size range: 64, 128, 256, 512, and 1024
 pixels. Regenerate with `sh deploy/cs806/generate-logos.sh` (ImageMagick required)
 and commit the results. The nginx station-logos bind mount serves them directly.

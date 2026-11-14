@@ -1,4 +1,5 @@
 import http.client
+import io
 import json
 from pathlib import Path
 import ssl
@@ -174,6 +175,7 @@ class AdapterTests(unittest.TestCase):
         self.save()
         key = next(k for k,r in self.favorites.stations().items() if r["name"] == "Zulu")
         server = self.start_server(adapter.RadioHandler)
+        server.favorites.force_icy_url = self.rows[0]["url"]
         conn = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
         conn.request("GET", adapter.LOCAL+"stream/"+key, headers={"Authorization": "Basic test-only", "Icy-MetaData": "1"})
         res = conn.getresponse()
@@ -181,6 +183,38 @@ class AdapterTests(unittest.TestCase):
         self.assertNotIn("Authorization", seen)
         self.assertNotIn("Icy-MetaData", seen)
         conn.close()
+
+    def test_forced_icy_routes_one_station_and_preserves_metadata_blocks(self):
+        server = self.start_server(adapter.RadioHandler)
+        server.favorites.force_icy_url = self.rows[0]["url"]
+        key = next(k for k, r in self.favorites.stations().items() if r["name"] == "Zulu")
+        _, detail = self.tunnel_via_plain(server, adapter.DETAIL + key)
+        _, play = self.tunnel_via_plain(server, detail["streams"][0]["url"].removeprefix("https://radio.test"))
+        self.assertEqual(play["url"], "https://radio.test" + adapter.LOCAL + "stream/" + key)
+        self.assertFalse(server.favorites.force_icy(self.rows[1]))
+        body = b"audio" + b"\x01" + b"StreamTitle='X';" + b"more audio"
+        response = io.BytesIO(body)
+        response.status = 200
+        response.headers = {"Content-Type": "audio/mpeg", "icy-metaint": "5"}
+        with patch.object(adapter.urllib.request, "urlopen", return_value=response) as upstream:
+            conn = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+            conn.request("GET", adapter.LOCAL + "stream/" + key,
+                         headers={"Icy-MetaData": "0", "Authorization": "Basic test-only"})
+            res = conn.getresponse()
+            self.assertEqual(res.getheader("icy-metaint"), "5")
+            self.assertEqual(res.read(), body)
+            headers = {k.lower(): v for k, v in upstream.call_args.args[0].header_items()}
+            self.assertEqual(headers["icy-metadata"], "1")
+            self.assertNotIn("authorization", headers)
+            conn.close()
+
+    def tunnel_via_plain(self, server, path):
+        conn = http.client.HTTPConnection("127.0.0.1", server.server_port, timeout=3)
+        conn.request("GET", path)
+        res = conn.getresponse()
+        status, body = res.status, res.read()
+        conn.close()
+        return status, json.loads(body)
 
 
 if __name__ == "__main__":
